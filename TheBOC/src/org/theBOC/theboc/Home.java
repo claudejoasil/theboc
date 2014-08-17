@@ -29,8 +29,8 @@ public class Home extends Activity {
     private CharSequence mTitle;
     private String[] navMenuTitles;
     private TypedArray navMenuIcons;
-    private ArrayList<NavDrawerItem> navDrawerItems;
-    private NavDrawerListAdapter adapter;
+    //private ArrayList<NavDrawerItem> navDrawerItems;
+    //private NavDrawerListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
