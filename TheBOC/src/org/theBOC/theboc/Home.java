@@ -1,5 +1,8 @@
 package org.theBOC.theboc;
 
+import org.theBOC.theboc.Adapters.NavDrawerListAdapter;
+import org.theBOC.theboc.Models.NavDrawerItem;
+import java.util.ArrayList;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -7,6 +10,8 @@ import android.app.SearchManager;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.GradientDrawable.Orientation;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
@@ -16,7 +21,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -29,25 +33,50 @@ public class Home extends Activity {
     private CharSequence mTitle;
     private String[] navMenuTitles;
     private TypedArray navMenuIcons;
-    //private ArrayList<NavDrawerItem> navDrawerItems;
-    //private NavDrawerListAdapter adapter;
+    private ArrayList<NavDrawerItem> navDrawerItems;
+    private NavDrawerListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home);
 
-        mTitle = mDrawerTitle = getTitle();
+        mTitle = mDrawerTitle = getTitle();       
+        
         navMenuTitles = getResources().getStringArray(R.array.menu_Items);
+        navMenuIcons = getResources().obtainTypedArray(R.array.menu_icons);        
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        int[] colors = {0, 0xFFCCCCCC, 0}; 
+        mDrawerList.setDivider(new GradientDrawable(Orientation.RIGHT_LEFT, colors));
+        mDrawerList.setDividerHeight(1);
+        navDrawerItems = new ArrayList<NavDrawerItem>();
+        
+        navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
+		// Find People
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
+		// Photos
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1)));
+		// Communities, Will add a counter here
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[3], navMenuIcons.getResourceId(3, -1), true, "22"));
+		// Pages
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[4], navMenuIcons.getResourceId(4, -1)));
+		// What's hot, We  will add a counter here
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[5], navMenuIcons.getResourceId(5, -1), true, "50+"));
+		
 
+		// Recycle the typed array
+		navMenuIcons.recycle();		
+		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+		
+		// setting the nav drawer list adapter
+		adapter = new NavDrawerListAdapter(getApplicationContext(), navDrawerItems);
+		mDrawerList.setAdapter(adapter);		
         // set a custom shadow that overlays the main content when the drawer opens
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         // set up the drawer's list view with items and click listener
-        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-                R.layout.drawer_list_item, navMenuTitles));
-        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+        //mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, navMenuTitles));
+        
 
         // enable ActionBar app icon to behave as action to toggle nav drawer
         getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -120,7 +149,7 @@ public class Home extends Activity {
         }
     }
 
-    /* The click listner for ListView in the navigation drawer */
+    /* The click listener for ListView in the navigation drawer */
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
