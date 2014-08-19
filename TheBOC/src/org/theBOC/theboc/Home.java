@@ -166,10 +166,11 @@ public class Home extends Activity {
 	    	case 0:
 	    		frag = new HomeFragment();
 	    		break;
+	    	case 2:
+	    		frag = new BibleFragment();
+	    		break;
 			default:
-				frag = new PlanetFragment();
-				args.putInt(PlanetFragment.ARG_PLANET_NUMBER, position);
-				frag.setArguments(args);
+				frag = new HomeFragment();
     	}
         FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_frame, frag).commit();
