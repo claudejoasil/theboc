@@ -155,21 +155,24 @@ public class Home extends Activity {
     private void selectItem(int position) {
         // update the main content by replacing fragments
     	Bundle args = new Bundle();
-    	Fragment frag;
+    	Fragment frag = null;
     	switch(position)
     	{
 	    	case 0:
 	    		frag = new HomeFragment();
 	    		break;
 	    	case 2:
-	    		frag = new BibleFragment();
+	    		Intent bibleIntent = new Intent(Home.this, Bible.class);
+	    		startActivity(bibleIntent);
 	    		break;
 			default:
 				frag = new HomeFragment();
     	}
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.content_frame, frag).commit();
-
+    	if(frag != null)
+    	{
+	        FragmentManager fragmentManager = getFragmentManager();
+	        fragmentManager.beginTransaction().replace(R.id.content_frame, frag).commit();    		
+    	}
         // update selected item and title, then close the drawer
         mDrawerList.setItemChecked(position, true);
         setTitle(navMenuTitles[position]);
