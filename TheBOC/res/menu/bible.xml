@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item
+        android:id="@+id/action_bible_book_chapter"
+        android:showAsAction="ifRoom"
+        android:title="GEN 1"/>
+    <item
+        android:id="@+id/action_bible_version"
+        android:showAsAction="ifRoom"
+        android:title="ASV"/>
+</menu>
