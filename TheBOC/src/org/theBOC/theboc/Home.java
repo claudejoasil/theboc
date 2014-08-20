@@ -171,12 +171,13 @@ public class Home extends Activity {
     	if(frag != null)
     	{
 	        FragmentManager fragmentManager = getFragmentManager();
-	        fragmentManager.beginTransaction().replace(R.id.content_frame, frag).commit();    		
+	        fragmentManager.beginTransaction().replace(R.id.content_frame, frag).commit();  
+	     // update selected item and title, then close the drawer
+	        mDrawerList.setItemChecked(position, true);
+	        setTitle(navMenuTitles[position]);
+	        mDrawerLayout.closeDrawer(mDrawerList);
     	}
-        // update selected item and title, then close the drawer
-        mDrawerList.setItemChecked(position, true);
-        setTitle(navMenuTitles[position]);
-        mDrawerLayout.closeDrawer(mDrawerList);
+        
     }
 
     @Override

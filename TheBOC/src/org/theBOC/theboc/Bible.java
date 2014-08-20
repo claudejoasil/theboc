@@ -4,13 +4,10 @@ import java.util.ArrayList;
 
 import org.theBOC.theboc.Adapters.VerseListAdapter;
 
-import android.os.Build;
 import android.os.Bundle;
-import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.SearchManager;
-import android.content.Intent;
+import android.database.Cursor;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
@@ -22,28 +19,23 @@ public class Bible extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_bible);
+		BOCdb db = new BOCdb(this);
+		Cursor cur = db.getVerses();
+		
 		ActionBar actionBar = getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setIcon(R.drawable.ic_bible);
 		ListView lstView = (ListView) findViewById(R.id.lst_bible_verses);
 		lstView.setDivider(null);
 		ArrayList<org.theBOC.theboc.Models.Bible> verses = new ArrayList<org.theBOC.theboc.Models.Bible>();
-		org.theBOC.theboc.Models.Bible bible = new org.theBOC.theboc.Models.Bible();
-		bible.setVerse(1);
-		bible.setVerseText("Au commencement etait la parole, la parole etait avec Dieu");
-		verses.add(bible);
-		bible.setVerse(1);
-		bible.setVerseText("Au commencement etait la parole, la parole etait avec Dieu");
-		verses.add(bible);
-		bible.setVerse(1);
-		bible.setVerseText("Au commencement etait la parole, la parole etait avec Dieu");
-		verses.add(bible);
-		bible.setVerse(1);
-		bible.setVerseText("Au commencement etait la parole, la parole etait avec Dieu");
-		verses.add(bible);
-		bible.setVerse(1);
-		bible.setVerseText("Au commencement etait la parole, la parole etait avec Dieu");
-		verses.add(bible);
+		if (cur.moveToFirst()) {
+            do {
+            	org.theBOC.theboc.Models.Bible bible = new org.theBOC.theboc.Models.Bible();
+                bible.setVerse(Integer.parseInt(cur.getString(0)));
+                bible.setVerseText(cur.getString(1));
+                verses.add(bible);
+            } while (cur.moveToNext());
+        }
 		VerseListAdapter adt = new VerseListAdapter(this, verses);
 		lstView.setAdapter(adt);
 	}

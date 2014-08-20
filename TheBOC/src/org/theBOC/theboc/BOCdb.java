@@ -22,16 +22,16 @@ public class BOCdb extends SQLiteAssetHelper{
 		
 	}
 
-	public Cursor getEmployees() {
+	public Cursor getVerses() {
 
 		SQLiteDatabase db = getReadableDatabase();
 		SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 
-		String [] sqlSelect = {"0 _id", "FirstName", "LastName"}; 
-		String sqlTables = "Employees";
-
+		String [] sqlSelect = {"ZVERSE", "ZVERSETEXT"}; 
+		String sqlTables = "ZBIBLELSG";
+		String where = "ZBOOKID=1 AND ZCHAPTER=1";
 		qb.setTables(sqlTables);
-		Cursor c = qb.query(db, sqlSelect, null, null, null, null, null);
+		Cursor c = qb.query(db, sqlSelect, where, null, null, null, null);
 
 		c.moveToFirst();
 		return c;
