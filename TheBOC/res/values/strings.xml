@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">TheBOC</string>
     <string name="action_settings">Settings</string>
+
     <string-array name="menu_Items">
         <item>TheBOC</item>
         <item>BOC Articles</item>
@@ -11,6 +13,7 @@
         <item>BOC Events</item>
         <item>BOC Multimedia</item>
     </string-array>
+
     <array name="menu_icons">
         <item>@drawable/ic_home</item>
         <item>@drawable/ic_article</item>
@@ -20,6 +23,7 @@
         <item>@drawable/ic_event</item>
         <item>@drawable/ic_home</item>
     </array>
+
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
     <string name="action_websearch">Web search</string>
@@ -27,4 +31,7 @@
     <string name="title_activity_home_fragment">HomeFragment</string>
     <string name="desc_list_item_icon">Item Icon</string>
     <string name="the_bible">BOC Bible</string>
+    <string name="title_activity_bible">Bible</string>
+    <string name="hello_world">Hello world!</string>
+
 </resources>
