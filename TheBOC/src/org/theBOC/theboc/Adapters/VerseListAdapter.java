@@ -7,6 +7,7 @@ import org.theBOC.theboc.Models.Bible;
 
 import android.app.Activity;
 import android.content.Context;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,14 +44,15 @@ public class VerseListAdapter extends BaseAdapter {
 		if (convertView == null) {
             LayoutInflater mInflater = (LayoutInflater)
                     context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-            convertView = mInflater.inflate(R.layout.verse_item, null);
+            convertView = mInflater.inflate(R.layout.verse_item, parent, false);
         }  
 		Bible bible = verses.get(position);
-        TextView txtVerse = (TextView) convertView.findViewById(R.id.verse_number);
-        TextView txtVerseText = (TextView) convertView.findViewById(R.id.verse_text);               
-        txtVerse.setText(bible.getVerse());
-        txtVerseText.setText(bible.getVerseText());        
-        return convertView;
+        //TextView txtVerse = (TextView) convertView.findViewById(R.id.verse_number);
+        TextView txtVerseText = (TextView) convertView.findViewById(R.id.verse_text); 
+        String VerseText = "<font color=#F06B29>" + Integer.toString(bible.getVerse()) + "</font> " + bible.getVerseText();
+        txtVerseText.setText(Html.fromHtml(VerseText));        
+        //txtVerse.setText();
+         return convertView;
 	}
 
 }
