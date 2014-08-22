@@ -49,7 +49,10 @@ public class VerseListAdapter extends BaseAdapter {
 		Bible bible = verses.get(position);
         //TextView txtVerse = (TextView) convertView.findViewById(R.id.verse_number);
         TextView txtVerseText = (TextView) convertView.findViewById(R.id.verse_text); 
-        String VerseText = "<font color=#F06B29>" + Integer.toString(bible.getVerse()) + "</font> " + bible.getVerseText();
+        String VerseText = "<font color='#813f15'>" + 
+        						Integer.toString(bible.getVerse()) + 
+						   "</font> " + 
+    						bible.getVerseText();
         txtVerseText.setText(Html.fromHtml(VerseText));        
         //txtVerse.setText();
          return convertView;

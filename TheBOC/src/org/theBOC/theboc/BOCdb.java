@@ -10,18 +10,18 @@ import android.database.sqlite.SQLiteQueryBuilder;
 public class BOCdb extends SQLiteAssetHelper{
 	private static final String DATABASE_NAME = "theBOC.db";
 	private static final int DATABASE_VERSION = 1;
+	private static BOCdb dbInstance;
 	
-	public BOCdb(Context context) {
-		super(context, DATABASE_NAME, null, DATABASE_VERSION);
-		
-		// you can use an alternate constructor to specify a database location 
-		// (such as a folder on the sd card)
-		// you must ensure that this folder is available and you have permission
-		// to write to it
-		//super(context, DATABASE_NAME, context.getExternalFilesDir(null).getAbsolutePath(), null, DATABASE_VERSION);
-		
+	private BOCdb(Context context) {
+		super(context, DATABASE_NAME, null, DATABASE_VERSION);		
 	}
-
+	public static BOCdb getInstance(Context context)
+	{
+		if(dbInstance != null)
+			return dbInstance;
+		else
+			return new BOCdb(context);
+	}
 	public Cursor getVerses() {
 
 		SQLiteDatabase db = getReadableDatabase();

@@ -3,11 +3,7 @@
     package="org.theBOC.theboc"
     android:versionCode="1"
     android:versionName="1.0" >
-
-    <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="18" />
-
+    <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="18" />
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -26,6 +22,12 @@
             android:label="@string/title_activity_bible"
             android:parentActivityName="org.theBOC.theboc.Home" >
         </activity>
+<!--         <activity android:uiOptions="splitActionBarWhenNarrow"  -->
+<!--             android:name="org.theBOC.theboc.Bible" -->
+<!--             android:label="@string/title_activity_bible" -->
+<!--             android:parentActivityName="org.theBOC.theboc.Home" > -->
+<!--             <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow" /> -->
+<!--         </activity> -->
     </application>
 
 </manifest>
