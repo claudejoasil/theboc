@@ -1,10 +1,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     <item
         android:id="@+id/action_bible_book_chapter"
-        android:showAsAction="ifRoom"
-        android:title="GEN 1"/>
+        android:showAsAction="always"/>
     <item
         android:id="@+id/action_bible_version"
-        android:showAsAction="ifRoom"
-        android:title="ASV"/>
+        android:showAsAction="always"/>
+    <item
+        android:id="@+id/action_bible_previous_chapter"
+        android:showAsAction="always"
+        android:title="Previous"/>
+    <item
+        android:id="@+id/action_bible_next_chapter"
+        android:showAsAction="always"
+        android:title="Next"/>
 </menu>

@@ -153,9 +153,7 @@ public class Home extends Activity {
     }
 
     private void selectItem(int position) {
-        // update the main content by replacing fragments
-    	Bundle args = new Bundle();
-    	Fragment frag = null;
+        Fragment frag = null;
     	switch(position)
     	{
 	    	case 0:
