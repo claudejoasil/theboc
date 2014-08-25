@@ -14,7 +14,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
-import android.widget.Toast;
 
 public class Bible extends Activity {
 	public static final String currentValues = "BibleCurrentValues";
@@ -41,7 +40,7 @@ public class Bible extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_bible);
 		if(this.currentBookId <= 0)
-			this.setCurrentValues(0);
+			this.setCurrentValues(-1);
 		lstView = (ListView) findViewById(R.id.lst_bible_verses);
 		this.initDB();		
 		ArrayList<org.theBOC.theboc.Models.Bible> verses = bibleDB.getVerses(this.currentBookId, this.currentChapter, this.currentVersionObj.getShortName());		
@@ -57,7 +56,7 @@ public class Bible extends Activity {
 		getMenuInflater().inflate(R.menu.bible, menu);
 		this.menu = menu;
 		if(this.currentBookId <= 0)
-			this.setCurrentValues(0);
+			this.setCurrentValues(-1);
 		this.updateActionTitles();
 		return true;
 	}
@@ -66,11 +65,12 @@ public class Bible extends Activity {
          // Handle action buttons
         switch(item.getItemId()) {
         case R.id.action_bible_book_chapter:
-        	Intent bibleIntent = new Intent(Bible.this, Books.class);
-    		startActivity(bibleIntent);
+        	Intent bookIntent = new Intent(Bible.this, Books.class);
+    		startActivity(bookIntent);
             return true;
         case R.id.action_bible_version:
-        	Toast.makeText(this, "Bible Versions", Toast.LENGTH_LONG).show();
+        	Intent versionIntent = new Intent(Bible.this, Versions.class);
+    		startActivity(versionIntent);
             return true;        
         default:
             return super.onOptionsItemSelected(item);
@@ -81,7 +81,7 @@ public class Bible extends Activity {
 		switch(view.getId())
 		{
 			case R.id.btnNextChapter:
-	        	if(bibleDB != null)
+	        	if(bibleDB == null)
 	        		bibleDB = new org.theBOC.theboc.database.Bible(this);
 	        	if(this.currentChapter + 1 <= this.currentBookObj.getNumChapters())
 	        		this.currentChapter++;
@@ -92,7 +92,7 @@ public class Bible extends Activity {
 	    		this.updateActionTitles();
 	            break;
 	        case R.id.btnPreviousChapter: //TODO FIX
-	        	if(bibleDB != null)
+	        	if(bibleDB == null)
 	        		bibleDB = new org.theBOC.theboc.database.Bible(this);
 	        	if(this.currentChapter > 1)
 	        		this.currentChapter--; 
@@ -113,7 +113,7 @@ public class Bible extends Activity {
 		this.currentVersionObj = versionDB.getVersion(this.currentVersionId, null);
 		if(bookDB == null)
 			bookDB = new org.theBOC.theboc.database.Book(this);
-		if(bookId == 0)
+		if(bookId == -1)
 		{
 			this.currentBookId = sharedpreferences.getInt(BookId, 1);
 			this.currentBookObj = bookDB.getBook(this.currentBookId, this.currentVersionObj.getLanguage());

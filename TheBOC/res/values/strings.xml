@@ -38,5 +38,6 @@
     <string name="title_activity_books">Books</string>
     <string name="new_testament">New Testament</string>
     <string name="old_testament">Old Testament</string>
+    <string name="title_activity_versions">Versions</string>
 
 </resources>

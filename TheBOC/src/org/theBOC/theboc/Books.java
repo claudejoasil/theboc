@@ -45,10 +45,11 @@ ActionBar.TabListener{
 	@Override
 	public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) 
 	{
-	    // When the given tab is selected, show the tab contents in the
+		
+		// When the given tab is selected, show the tab contents in the
 	    // container view.
 	    
-	  }
+	}
 
 	  @Override
 	  public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) 
