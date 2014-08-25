@@ -20,7 +20,7 @@ public class Versions extends Activity {
 		setContentView(R.layout.activity_versions);
 		if(versionDB == null)
 			versionDB = new org.theBOC.theboc.database.Version(this);
-		ArrayList<Version> versions = versionDB.getVersions(null);
+		ArrayList<Version> versions = versionDB.getVersions(null, true);
 		lstView = (ListView) findViewById(R.id.lst_bible_versions);
 		lstView.setDivider(null);		
 		VersionListAdapter adt = new VersionListAdapter(this, versions);

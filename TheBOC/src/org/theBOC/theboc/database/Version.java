@@ -1,5 +1,7 @@
 package org.theBOC.theboc.database;
 import java.util.ArrayList;
+import java.util.Locale;
+
 import org.theBOC.theboc.BOCdb;
 import android.content.Context;
 import android.database.Cursor;
@@ -12,7 +14,7 @@ public class Version {
 		bocDB = BOCdb.getInstance(context);
 	}
 	
-	public ArrayList<org.theBOC.theboc.Models.Version> getVersions(String language) 
+	public ArrayList<org.theBOC.theboc.Models.Version> getVersions(String language, boolean withHeader) 
 	{
 		SQLiteDatabase db = bocDB.getReadableDatabase();
 		SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
@@ -28,14 +30,35 @@ public class Version {
 		c.moveToFirst();
 		ArrayList<org.theBOC.theboc.Models.Version> versions = new ArrayList<org.theBOC.theboc.Models.Version>();
 		if (c.moveToFirst()) {
-            do {
-            	org.theBOC.theboc.Models.Version version = new org.theBOC.theboc.Models.Version();
-                version.setId(Integer.parseInt(c.getString(0)));
-                version.setLanguage(c.getString(1));
-                version.setName(c.getString(2));
-                version.setShortName(c.getString(3));
-                versions.add(version);
-            } while (c.moveToNext());
+			if(withHeader)
+			{
+				String currentLanguage = "";
+				do {
+	            	org.theBOC.theboc.Models.Version version = new org.theBOC.theboc.Models.Version();
+	            	if(currentLanguage.toLowerCase(Locale.ENGLISH) != c.getString(1).toLowerCase(Locale.ENGLISH))
+	            	{
+	            		version.setIsGroupHeader(true);
+	            		version.setName(c.getString(1));
+	            		versions.add(version);
+	            		currentLanguage = c.getString(1);
+	            	}
+	            	version = new org.theBOC.theboc.Models.Version();
+	                version.setId(Integer.parseInt(c.getString(0)));
+	                version.setLanguage(c.getString(1));
+	                version.setName(c.getString(2));
+	                version.setShortName(c.getString(3));
+	                versions.add(version);
+	            } while (c.moveToNext());
+			} else {			
+	            do {
+	            	org.theBOC.theboc.Models.Version version = new org.theBOC.theboc.Models.Version();
+	                version.setId(Integer.parseInt(c.getString(0)));
+	                version.setLanguage(c.getString(1));
+	                version.setName(c.getString(2));
+	                version.setShortName(c.getString(3));
+	                versions.add(version);
+	            } while (c.moveToNext());
+			}
         }
 		return versions;
 	}
