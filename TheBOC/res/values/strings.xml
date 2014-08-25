@@ -5,23 +5,23 @@
     <string name="action_settings">Settings</string>
 
     <string-array name="menu_Items">
-        <item>TheBOC</item>
-        <item>BOC Articles</item>
+        <item>Home</item>
+        <!-- <item>BOC Articles</item> -->
         <item>BOC Bible</item>
-        <item>BOC Reading Plan</item>
+        <!-- <item>BOC Reading Plan</item> -->
         <item>BOC Songs</item>
         <item>BOC Events</item>
-        <item>BOC Multimedia</item>
+        <!-- <item>BOC Multimedia</item> -->
     </string-array>
 
     <array name="menu_icons">
         <item>@drawable/ic_home</item>
-        <item>@drawable/ic_article</item>
+        <!-- <item>@drawable/ic_article</item> -->
         <item>@drawable/ic_bible</item>
-        <item>@drawable/ic_reading_plan</item>
+        <!-- <item>@drawable/ic_reading_plan</item> -->
         <item>@drawable/ic_song</item>
         <item>@drawable/ic_event</item>
-        <item>@drawable/ic_home</item>
+        <!-- <item>@drawable/ic_home</item> -->
     </array>
 
     <string name="drawer_open">Open navigation drawer</string>

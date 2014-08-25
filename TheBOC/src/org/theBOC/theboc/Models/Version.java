@@ -5,10 +5,8 @@ public class Version {
 	private String language;
 	private String name;
 	private String shortName;
-	public Version()
-	{
-		
-	}
+	private boolean isGroupHeader;
+	public Version(){}
 	public int getId()
 	{
 		return this.id;
@@ -40,5 +38,13 @@ public class Version {
 	public void setShortName(String shortName)
 	{
 		this.shortName = shortName;
+	}
+	public boolean getIsGroupHeader()
+	{
+		return this.isGroupHeader;
+	}
+	public void setIsGroupHeader(boolean isGroupHeader)
+	{
+		this.isGroupHeader = isGroupHeader;
 	}
 }

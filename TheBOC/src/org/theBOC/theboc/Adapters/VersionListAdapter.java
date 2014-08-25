@@ -39,15 +39,18 @@ public class VersionListAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		if (convertView == null) {
-            LayoutInflater mInflater = (LayoutInflater)
-                    context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-            convertView = mInflater.inflate(R.layout.version_item, parent, false);
-        }  
-		Version version = versions.get(position);
-        TextView txtVerseText = (TextView) convertView.findViewById(R.id.version_text); 
-        String VersionText = version.getName();
-        txtVerseText.setText(VersionText);   
+		LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);        
+        Version version = versions.get(position);
+		if(!version.getIsGroupHeader())		{
+			convertView = mInflater.inflate(R.layout.version_item, parent, false);
+			TextView txtVerseText = (TextView) convertView.findViewById(R.id.version_text); 
+	        String VersionText = version.getName();
+	        txtVerseText.setText(VersionText);   
+		} else {
+			convertView = mInflater.inflate(R.layout.version_header_item, parent, false);
+			TextView titleView = (TextView) convertView.findViewById(R.id.header);
+            titleView.setText(version.getName());
+		}        
          return convertView;
 	}
 
