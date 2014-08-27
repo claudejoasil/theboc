@@ -21,6 +21,7 @@ public class Bible extends Activity {
 	public static final String Chapter = "chapterKey"; 
 	public static final String Verse = "verseKey"; 
 	public static final String VersionId = "versionIdKey";
+	public static final String Language = "languageKey";
 	public static final int lastBookId = 66;
 	public int currentBookId;
 	public int currentChapter;
@@ -46,7 +47,8 @@ public class Bible extends Activity {
 		ArrayList<org.theBOC.theboc.Models.Bible> verses = bibleDB.getVerses(this.currentBookId, this.currentChapter, this.currentVersionObj.getShortName());		
 		this.bindBible(verses);
 		ActionBar actionBar = getActionBar();
-		actionBar.setDisplayHomeAsUpEnabled(true);
+		//actionBar.setDisplayHomeAsUpEnabled(true);
+		actionBar.setDisplayShowTitleEnabled(false);
 		actionBar.setIcon(R.drawable.ic_bible);		
 	}
 
@@ -111,6 +113,7 @@ public class Bible extends Activity {
 		if(versionDB == null)
 			versionDB = new org.theBOC.theboc.database.Version(this);
 		this.currentVersionObj = versionDB.getVersion(this.currentVersionId, null);
+		
 		if(bookDB == null)
 			bookDB = new org.theBOC.theboc.database.Book(this);
 		if(bookId == -1)
@@ -149,7 +152,7 @@ public class Bible extends Activity {
 		{
 			MenuItem itemBookChapter = menu.findItem(R.id.action_bible_book_chapter);
 			MenuItem itemVersion = menu.findItem(R.id.action_bible_version);
-			itemBookChapter.setTitle(this.currentBookObj.getShortName() + " " +  this.currentChapter);
+			itemBookChapter.setTitle(this.currentBookObj.getName() + " " +  this.currentChapter);
 			itemVersion.setTitle(this.currentVersionObj.getShortName());
 		}
 	}

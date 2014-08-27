@@ -45,7 +45,7 @@ public class Book {
 	}
 	public String getShortName()
 	{
-		if(this.shortName != null && this.shortName != "")
+		if(this.shortName != null && !this.shortName.trim().equals(""))
 			return this.shortName;
 		else
 			return this.name.substring(0, 3);			
