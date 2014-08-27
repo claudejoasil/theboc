@@ -40,9 +40,7 @@ public class Home extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home);
-
-        mTitle = mDrawerTitle = getTitle();       
-        
+    	mTitle = mDrawerTitle = getTitle();       
         navMenuTitles = getResources().getStringArray(R.array.menu_Items);
         navMenuIcons = getResources().obtainTypedArray(R.array.menu_icons);        
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);

@@ -43,12 +43,14 @@ public class VersionListAdapter extends BaseAdapter {
         Version version = versions.get(position);
 		if(!version.getIsGroupHeader())		{
 			convertView = mInflater.inflate(R.layout.version_item, parent, false);
-			TextView txtVerseText = (TextView) convertView.findViewById(R.id.version_text); 
+			TextView txtNameText = (TextView) convertView.findViewById(R.id.version_text); 
+			TextView txtShortName = (TextView) convertView.findViewById(R.id.txt_short_name);
 	        String VersionText = version.getName();
-	        txtVerseText.setText(VersionText);   
+	        txtNameText.setText(VersionText);  
+	        txtShortName.setText(version.getShortName());
 		} else {
 			convertView = mInflater.inflate(R.layout.version_header_item, parent, false);
-			TextView titleView = (TextView) convertView.findViewById(R.id.header);
+			TextView titleView = (TextView) convertView.findViewById(R.id.item_header);
             titleView.setText(version.getName());
 		}        
          return convertView;

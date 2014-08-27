@@ -22,18 +22,26 @@ public class Bible {
 		String [] sqlSelect = {"ZVERSE", "ZVERSETEXT"}; 
 		String sqlTables = "ZBIBLE" + version;
 		String where = "ZBOOKID=" + bookId + " AND ZCHAPTER=" + chapter;
-		qb.setTables(sqlTables);
-		Cursor c = qb.query(db, sqlSelect, where, null, null, null, null);
-		c.moveToFirst();
 		ArrayList<org.theBOC.theboc.Models.Bible> verses = new ArrayList<org.theBOC.theboc.Models.Bible>();
-		if (c.moveToFirst()) {
-            do {
-            	org.theBOC.theboc.Models.Bible bible = new org.theBOC.theboc.Models.Bible();
-                bible.setVerse(Integer.parseInt(c.getString(0)));
-                bible.setVerseText(c.getString(1));
-                verses.add(bible);
-            } while (c.moveToNext());
-        }
+		qb.setTables(sqlTables);
+		try
+		{
+			Cursor c = qb.query(db, sqlSelect, where, null, null, null, null);
+			c.moveToFirst();
+			
+			if (c.moveToFirst()) {
+	            do {
+	            	org.theBOC.theboc.Models.Bible bible = new org.theBOC.theboc.Models.Bible();
+	                bible.setVerse(Integer.parseInt(c.getString(0)));
+	                bible.setVerseText(c.getString(1));
+	                verses.add(bible);
+	            } while (c.moveToNext());
+	        }
+		}
+		catch(Exception e)
+		{
+			// THIS Version doesn't exist yet
+		}
 		return verses;
 	}
 }

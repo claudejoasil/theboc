@@ -1,6 +1,5 @@
 package org.theBOC.theboc.database;
 import java.util.ArrayList;
-import java.util.Locale;
 
 import org.theBOC.theboc.BOCdb;
 import android.content.Context;
@@ -35,7 +34,7 @@ public class Version {
 				String currentLanguage = "";
 				do {
 	            	org.theBOC.theboc.Models.Version version = new org.theBOC.theboc.Models.Version();
-	            	if(currentLanguage.toLowerCase(Locale.ENGLISH) != c.getString(1).toLowerCase(Locale.ENGLISH))
+	            	if(!currentLanguage.equalsIgnoreCase(c.getString(1)))
 	            	{
 	            		version.setIsGroupHeader(true);
 	            		version.setName(c.getString(1));
