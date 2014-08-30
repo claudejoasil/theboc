@@ -1,9 +1,5 @@
 package org.theBOC.theboc;
 
-import java.util.ArrayList;
-
-import org.theBOC.theboc.Adapters.BookListAdapter;
-import org.theBOC.theboc.Models.Book;
 
 import android.os.Bundle;
 import android.app.ActionBar.Tab;
@@ -13,24 +9,11 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.GradientDrawable.Orientation;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.AdapterView.OnItemClickListener;
 
 public class Books extends Activity {
 	public static Context appContext;
-	private static org.theBOC.theboc.database.Book bookDB;
-	private ArrayList<Book> books;
-	private SharedPreferences sharedpreferences;
-	public static final String currentValues = "BibleCurrentValues";
 	public static final String BookId = "bookIdKey";
 	public static final String Chapter = "chapterKey";
 	public static final String Language = "languageKey";
@@ -84,47 +67,12 @@ public class Books extends Activity {
 			}
 			return super.onOptionsItemSelected(item);
 		}
-		
-		class TestamentFragment extends Fragment {
-			private ListView lstView;
-			private int theTestament;
-			public TestamentFragment(int value){
-				this.theTestament = value;
-			}
-		    @Override
-		    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		        // Inflate the layout for this fragment
-		    	if(bookDB == null)
-		    		bookDB = new org.theBOC.theboc.database.Book(appContext);
-		    	sharedpreferences = getSharedPreferences(currentValues, Context.MODE_PRIVATE);
-		    	String language = sharedpreferences.getString(Language, "");
-				books = bookDB.getBooks(this.theTestament, language);
-				View frag = inflater.inflate(R.layout.testament_fragment, container, false);
-				lstView = (ListView) frag.findViewById(R.id.lst_books);
-				int[] colors = {0, 0xFFCCCCCC, 0}; 
-				lstView.setDivider(new GradientDrawable(Orientation.RIGHT_LEFT, colors));
-				lstView.setDividerHeight(1);
-				lstView.setOnItemClickListener(new OnItemClickListener() 
-				{
-			          public void onItemClick(AdapterView<?> parent, View view, int position, long id) 
-			          {
-			        	  Book book = books.get(position);
-			        	  sharedpreferences.edit().putInt(BookId, book.getBookId()).apply();
-			        	  Intent bibleIntent = new Intent(Books.this, Bible.class);
-			        	  startActivity(bibleIntent);
-			          }
-				});
-				BookListAdapter adt = new BookListAdapter(appContext, books);
-				lstView.setAdapter(adt);
-				return frag;
-		    }
-
-	 	}
 	}
 
 	class MyTabsListener implements ActionBar.TabListener {
 		public Fragment fragment;
-
+		public MyTabsListener() {
+		}
 		public MyTabsListener(Fragment fragment) {
 			this.fragment = fragment;
 		}
