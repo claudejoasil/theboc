@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="@dimen/boc_default_gridItem_width"
+    android:layout_width="match_parent"
     android:layout_height="@dimen/boc_default_gridItem_height"
-   	android:background="#DEDEDE">
+    android:background="#FFFFFF">
     <TextView android:id="@+id/chapter_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

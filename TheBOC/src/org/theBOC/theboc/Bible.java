@@ -35,6 +35,8 @@ public class Bible extends Activity {
 	private static org.theBOC.theboc.database.Bible bibleDB;
 	private static org.theBOC.theboc.database.Book bookDB;
 	private static org.theBOC.theboc.database.Version versionDB;
+	private static ArrayList<org.theBOC.theboc.Models.Bible> m_verses;
+	private static int m_textSize;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +47,8 @@ public class Bible extends Activity {
 		lstView = (ListView) findViewById(R.id.lst_bible_verses);
 		this.initDB();		
 		ArrayList<org.theBOC.theboc.Models.Bible> verses = bibleDB.getVerses(this.currentBookId, this.currentChapter, this.currentVersionObj.getShortName());		
-		this.bindBible(verses);
+		m_textSize = m_textSize <= 0 ? (int)this.getResources().getDimension(R.dimen.bible_Default_text_size) : m_textSize;
+		this.bindBible(verses, 0);
 		ActionBar actionBar = getActionBar();
 		//actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setDisplayShowTitleEnabled(false);
@@ -73,7 +76,29 @@ public class Bible extends Activity {
         case R.id.action_bible_version:
         	Intent versionIntent = new Intent(Bible.this, Versions.class);
     		startActivity(versionIntent);
-            return true;        
+            return true;   
+        case R.id.action_previous:
+        	if(bibleDB == null)
+        		bibleDB = new org.theBOC.theboc.database.Bible(this);
+        	if(this.currentChapter > 1)
+        		this.currentChapter--; 
+        	else
+        		this.setCurrentValues(this.currentBookObj.getBookId() - 1);
+    		ArrayList<org.theBOC.theboc.Models.Bible> verses1 = bibleDB.getVerses(this.currentBookId, this.currentChapter, this.currentVersionObj.getShortName());
+    		this.bindBible(verses1, 0);
+    		this.updateActionTitles();
+    		return true;
+        case R.id.action_next:
+        	if(bibleDB == null)
+        		bibleDB = new org.theBOC.theboc.database.Bible(this);
+        	if(this.currentChapter + 1 <= this.currentBookObj.getNumChapters())
+        		this.currentChapter++;
+        	else
+        		this.setCurrentValues(this.currentBookObj.getBookId() + 1);        		 
+    		ArrayList<org.theBOC.theboc.Models.Bible> verses = bibleDB.getVerses(this.currentBookId, this.currentChapter, this.currentVersionObj.getShortName());
+    		this.bindBible(verses, 0);
+    		this.updateActionTitles();
+    		return true;
         default:
             return super.onOptionsItemSelected(item);
         }
@@ -82,27 +107,11 @@ public class Bible extends Activity {
 	{
 		switch(view.getId())
 		{
-			case R.id.btnNextChapter:
-	        	if(bibleDB == null)
-	        		bibleDB = new org.theBOC.theboc.database.Bible(this);
-	        	if(this.currentChapter + 1 <= this.currentBookObj.getNumChapters())
-	        		this.currentChapter++;
-	        	else
-	        		this.setCurrentValues(this.currentBookObj.getBookId() + 1);        		 
-	    		ArrayList<org.theBOC.theboc.Models.Bible> verses = bibleDB.getVerses(this.currentBookId, this.currentChapter, this.currentVersionObj.getShortName());
-	    		this.bindBible(verses);
-	    		this.updateActionTitles();
+			case R.id.btnMagnifyMinus:
+	        	this.bindBible(null, -2);
 	            break;
-	        case R.id.btnPreviousChapter: //TODO FIX
-	        	if(bibleDB == null)
-	        		bibleDB = new org.theBOC.theboc.database.Bible(this);
-	        	if(this.currentChapter > 1)
-	        		this.currentChapter--; 
-	        	else
-	        		this.setCurrentValues(this.currentBookObj.getBookId() - 1);
-	    		ArrayList<org.theBOC.theboc.Models.Bible> verses1 = bibleDB.getVerses(this.currentBookId, this.currentChapter, this.currentVersionObj.getShortName());
-	    		this.bindBible(verses1);
-	    		this.updateActionTitles();
+	        case R.id.btnMagnifyPlus: 
+	        	this.bindBible(null, 2);
 	            break;
 		}
 	}
@@ -156,10 +165,19 @@ public class Bible extends Activity {
 			itemVersion.setTitle(this.currentVersionObj.getShortName());
 		}
 	}
-	private void bindBible(ArrayList<org.theBOC.theboc.Models.Bible> verses)
+	private void bindBible(ArrayList<org.theBOC.theboc.Models.Bible> verses, int textSizeIncrement)
 	{
+		if(verses == null)
+		{
+			verses = m_verses;
+		}
+		else
+		{
+			m_verses = verses;
+		}
+		m_textSize += textSizeIncrement;
 		lstView.setDivider(null);		
-		VerseListAdapter adt = new VerseListAdapter(this, verses);
+		VerseListAdapter adt = new VerseListAdapter(this, verses, (float)m_textSize);
 		lstView.setAdapter(adt);
 	}
 	private void initDB()

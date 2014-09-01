@@ -20,25 +20,25 @@
         android:gravity="center_horizontal"
         android:orientation="horizontal"
         android:showDividers="none" >
-	    <Button
-            android:id="@+id/btnPreviousChapter"
+	    <ImageButton
+            android:id="@+id/btnMagnifyPlus"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
+            android:src="@drawable/ic_action_magnifier_plus"
             android:gravity="center_vertical|center_horizontal"
-            android:onClick="bottomButtonClick"
-            android:text="@string/previous" />
+            android:contentDescription="@null"
+            android:onClick="bottomButtonClick" />
 
-        <Button
-            android:id="@+id/btnNextChapter"
+        <ImageButton
+            android:id="@+id/btnMagnifyMinus"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
+            android:src="@drawable/ic_action_magnifier_minus"
             android:gravity="center_vertical|center_horizontal"
-            android:onClick="bottomButtonClick"
-            android:text="@string/next" />
+            android:contentDescription="@null"
+            android:onClick="bottomButtonClick" />
         
 	</LinearLayout>
 

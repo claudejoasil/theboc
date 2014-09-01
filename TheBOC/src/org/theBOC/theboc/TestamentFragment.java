@@ -1,7 +1,6 @@
 package org.theBOC.theboc;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import org.theBOC.theboc.Adapters.BookListAdapter;
 
@@ -21,11 +20,13 @@ public class TestamentFragment extends Fragment {
 	private ExpandableListView lstView;
 	private int theTestament;
 	private static org.theBOC.theboc.database.Book bookDB;
-	private HashMap<org.theBOC.theboc.Models.Book, ArrayList<Integer>> books;
+	private ArrayList<org.theBOC.theboc.Models.Book> books;
 	private SharedPreferences sharedpreferences;
 	public static final String currentValues = "BibleCurrentValues";
 	private int lastExpandedPosition = -1;
 	public static final String Language = "languageKey";
+	public static final String BookId = "bookIdKey"; 
+	public static final String Testament = "testamentKey"; 
 	public TestamentFragment(){
 		
 	}
@@ -35,13 +36,17 @@ public class TestamentFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+    	int NUM_OLD_TESTAMENT_BOOKS = 39;
     	if(bookDB == null)
     		bookDB = new org.theBOC.theboc.database.Book(this.getActivity());
     	sharedpreferences = this.getActivity().getSharedPreferences(currentValues, Context.MODE_PRIVATE);
     	String language = sharedpreferences.getString(Language, "");
-		books = bookDB.getBooksWithChapterList(this.theTestament, language);
+    	int currentBookId = sharedpreferences.getInt(BookId, 0);
+    	int currentTestament = sharedpreferences.getInt(Testament, 0);
+		books = bookDB.getBooks(this.theTestament, language);
 		View frag = inflater.inflate(R.layout.testament_fragment, container, false);
 		lstView = (ExpandableListView) frag.findViewById(R.id.lst_books);
+		
 		lstView.setOnGroupExpandListener(new OnGroupExpandListener() {
 			@Override
 		    public void onGroupExpand(int groupPosition) {
@@ -56,8 +61,21 @@ public class TestamentFragment extends Fragment {
 		lstView.setDivider(new GradientDrawable(Orientation.RIGHT_LEFT, colors));
 		lstView.setDividerHeight(1);
 		
-		BookListAdapter adt = new BookListAdapter(this.getActivity(), bookDB.booksList, books);
+		BookListAdapter adt = new BookListAdapter(this.getActivity(), books);
 		lstView.setAdapter(adt);
+		if(currentBookId > 0) {
+			int position;
+			if(currentBookId > NUM_OLD_TESTAMENT_BOOKS && currentTestament == this.theTestament)
+			{
+				position = currentBookId - NUM_OLD_TESTAMENT_BOOKS - 1;
+				lstView.expandGroup(position, true);
+			}
+			if(currentBookId <= NUM_OLD_TESTAMENT_BOOKS && currentTestament == this.theTestament)
+			{
+				position = currentBookId - 1;
+				lstView.expandGroup(position, true);
+			}
+		}
 		return frag;
     }
 
