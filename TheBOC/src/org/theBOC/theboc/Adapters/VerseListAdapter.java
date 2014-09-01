@@ -8,6 +8,7 @@ import org.theBOC.theboc.Models.Bible;
 import android.app.Activity;
 import android.content.Context;
 import android.text.Html;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,10 +19,12 @@ public class VerseListAdapter extends BaseAdapter {
 	
 	private Context context;
 	private ArrayList<Bible> verses;
+	private float textSize;
 	
-	public VerseListAdapter(Context context, ArrayList<Bible> verses){
+	public VerseListAdapter(Context context, ArrayList<Bible> verses, float textSize){
 		this.context = context;
 		this.verses = verses;
+		this.textSize = textSize;
 	}
 
 	@Override
@@ -53,8 +56,16 @@ public class VerseListAdapter extends BaseAdapter {
         						Integer.toString(bible.getVerse()) + 
 						   "</font> " + 
     						bible.getVerseText();
-        txtVerseText.setText(Html.fromHtml(VerseText));        
+        txtVerseText.setText(Html.fromHtml(VerseText));    
+        txtVerseText.setTextSize(TypedValue.COMPLEX_UNIT_PX, this.textSize);
         //txtVerse.setText();
+        if(position == 0)
+        {
+        	convertView.setPadding((int)context.getResources().getDimension(R.dimen.activity_horizontal_margin), 
+        						  (int)context.getResources().getDimension(R.dimen.activity_vertical_margin), 
+        						  (int)context.getResources().getDimension(R.dimen.activity_horizontal_margin), 
+        						  0);
+        }
          return convertView;
 	}
 

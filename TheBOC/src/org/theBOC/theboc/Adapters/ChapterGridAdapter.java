@@ -14,14 +14,16 @@ import android.widget.TextView;
 public class ChapterGridAdapter extends BaseAdapter {
 	private Context context;
 	private ArrayList<Integer> chapters;
+	private int selectedChapter;
 	
-	public ChapterGridAdapter(Context context, int numChapters){
+	public ChapterGridAdapter(Context context, int numChapters, int chapter){
 		this.context = context;
 		chapters = new ArrayList<Integer>();
 		for(int i = 1; i <= numChapters; i++)
   	  	{
 			chapters.add(i);
   	  	}
+		this.selectedChapter = chapter;
 	}
 
 	@Override
@@ -47,6 +49,10 @@ public class ChapterGridAdapter extends BaseAdapter {
 			convertView = mInflater.inflate(R.layout.chapter_item, parent, false);
 		TextView txtText = (TextView) convertView.findViewById(R.id.chapter_text); 
         txtText.setText(Integer.toString(chapter));  
+        if(selectedChapter - 1 == position)
+        {
+        	convertView.setBackgroundColor(0xFFFAFAFA);
+        }
         return convertView;
 	}
 

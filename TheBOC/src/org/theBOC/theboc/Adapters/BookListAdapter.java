@@ -1,8 +1,6 @@
 package org.theBOC.theboc.Adapters;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.theBOC.theboc.Bible;
 import org.theBOC.theboc.R;
 import org.theBOC.theboc.Models.Book;
@@ -21,17 +19,17 @@ import android.widget.TextView;
 public class BookListAdapter extends BaseExpandableListAdapter {
 	private Context context;
 	private ArrayList<Book> books;
-	private HashMap<org.theBOC.theboc.Models.Book, ArrayList<Integer>> bookChapters;
 	private SharedPreferences sharedpreferences;
 	public static final String currentValues = "BibleCurrentValues";
 	public static final String BookId = "bookIdKey";
 	public static final String Chapter = "chapterKey";
 	public static final String Language = "languageKey";
-	public BookListAdapter(Context context, ArrayList<Book> books, HashMap<Book, ArrayList<Integer>> bookChapters)
+	public static final String testament = "testamentKey";
+	
+	public BookListAdapter(Context context, ArrayList<Book> books)
 	{
 		this.context = context;
 		this.books = books;
-		this.bookChapters = bookChapters;
 	}
 
 	@Override
@@ -52,7 +50,7 @@ public class BookListAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public Object getChild(int groupPosition, int childPosition) {
-		return this.bookChapters.get(this.books.get(groupPosition)).get(childPosition);
+		return null;
 	}
 
 	@Override
@@ -80,7 +78,8 @@ public class BookListAdapter extends BaseExpandableListAdapter {
         }
  
         TextView lblListHeader = (TextView) convertView.findViewById(R.id.book_text);
-        //lblListHeader.setTypeface(null, Typeface.BOLD);
+        //if(isExpanded)
+        	//lblListHeader.setTypeface(null, Typeface.BOLD);
         lblListHeader.setText(book.getName());
         return convertView;
 	}
@@ -91,34 +90,56 @@ public class BookListAdapter extends BaseExpandableListAdapter {
 		final Context theContext = this.context;
 		int numChapters = book.getNumChapters();
 		GridView chapterGridView;
-		 //if (convertView == null) {
-			 final int SPACING = 1;
-			 final int COL_WIDTH = (int) parent.getContext().getResources().getDimension(R.dimen.boc_default_gridItem_width);
-			 final int ROW_HEIGHT = (int) parent.getContext().getResources().getDimension(R.dimen.boc_default_gridItem_height);
-			 
-			 LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			 convertView = (ViewGroup) inflater.inflate(R.layout.activity_chapters, parent, false);
-			 chapterGridView = (GridView) convertView.findViewById(R.id.gridview);
-			 chapterGridView.setVerticalSpacing(SPACING);
-			 chapterGridView.setHorizontalSpacing(SPACING);
-			 chapterGridView.setAdapter(new ChapterGridAdapter(parent.getContext(), numChapters));
-			 
-			 final int colCount = (int)Math.floor((parent.getWidth() - (2 * SPACING)) / (COL_WIDTH + SPACING));
-			 final int rowCount = (int)Math.ceil(numChapters / colCount) + 1;
-			 final int gridHeight = Math.round(rowCount * (ROW_HEIGHT + SPACING));
-			 sharedpreferences = this.context.getSharedPreferences(currentValues, Context.MODE_PRIVATE);
-			 chapterGridView.setOnItemClickListener(new OnItemClickListener() 
-			 {
-		          public void onItemClick(AdapterView<?> parent, View view, int position, long id) 
-		          {
-		        	  sharedpreferences.edit().putInt(BookId, book.getBookId()).apply();
-		        	  sharedpreferences.edit().putInt(Chapter, position + 1).apply();
-		        	  Intent bibleIntent = new Intent(theContext, Bible.class);
-		        	  parent.getContext().startActivity(bibleIntent);
-		          } 
-			 });
-			 chapterGridView.getLayoutParams().height = gridHeight; 
-		// }
+		 final int SPACING = (int) parent.getContext().getResources().getDimension(R.dimen.boc_default_gridItem_spacing);
+		 final int COL_WIDTH = (int) parent.getContext().getResources().getDimension(R.dimen.chapter_column_width);
+		 final int ROW_HEIGHT = (int) parent.getContext().getResources().getDimension(R.dimen.boc_default_gridItem_height);
+		 final int PADDING = 0; //(int) parent.getContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
+		 
+		 LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		 convertView = (ViewGroup) inflater.inflate(R.layout.activity_chapters, parent, false);
+		 chapterGridView = (GridView) convertView.findViewById(R.id.gridview);
+		 chapterGridView.setVerticalSpacing(SPACING);
+		 chapterGridView.setHorizontalSpacing(SPACING);
+		 sharedpreferences = this.context.getSharedPreferences(currentValues, Context.MODE_PRIVATE);
+		 int currentChapter = sharedpreferences.getInt(Chapter, 0);
+		 int currentBookId = sharedpreferences.getInt(BookId, 0);
+		 if(book.getBookId() != currentBookId)
+		 {
+			 currentChapter = 0;
+		 }
+		 chapterGridView.setAdapter(new ChapterGridAdapter(parent.getContext(), numChapters, currentChapter));
+		 int parentWidth = parent.getWidth();
+		 int colCount;
+		 int rowCount;
+		 int gridHeight;
+		 int gridWidth;
+		 if(parentWidth <= numChapters * COL_WIDTH)
+		 {
+			 colCount = (int)Math.floor(parentWidth / (COL_WIDTH + SPACING));
+			 rowCount = (int)Math.ceil(numChapters / colCount);
+			 gridHeight = Math.round(rowCount * (ROW_HEIGHT + SPACING) + ROW_HEIGHT + SPACING);
+			 gridWidth = Math.round(colCount * (COL_WIDTH + SPACING) + SPACING);
+		 }
+		 else
+		 {
+			 colCount = numChapters;
+			 rowCount = 1;
+			 gridHeight = ROW_HEIGHT + SPACING;
+			 gridWidth = Math.round(colCount * (COL_WIDTH + SPACING) + SPACING);
+		 }
+		 chapterGridView.setOnItemClickListener(new OnItemClickListener() 
+		 {
+	          public void onItemClick(AdapterView<?> parent, View view, int position, long id) 
+	          {
+	        	  sharedpreferences.edit().putInt(BookId, book.getBookId()).apply();
+	        	  sharedpreferences.edit().putInt(Chapter, position + 1).apply();
+	        	  sharedpreferences.edit().putInt(testament, book.getTestament()).apply();
+	        	  Intent bibleIntent = new Intent(theContext, Bible.class);
+	        	  parent.getContext().startActivity(bibleIntent);
+	          } 
+		 });
+		 chapterGridView.getLayoutParams().height = gridHeight; 
+		 chapterGridView.getLayoutParams().width = gridWidth;  
         return convertView;
 	}
 

@@ -9,6 +9,7 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -17,11 +18,16 @@ public class Books extends Activity {
 	public static final String BookId = "bookIdKey";
 	public static final String Chapter = "chapterKey";
 	public static final String Language = "languageKey";
+	public static final String testament = "testamentKey";
+	private SharedPreferences sharedpreferences;
+	public static final String currentValues = "BibleCurrentValues";
 	/** Called when the activity is first created. */
 	@Override
 		public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_books);
+		sharedpreferences = getSharedPreferences(currentValues, Context.MODE_PRIVATE);
+		int currentTestament = sharedpreferences.getInt(testament, 1);
 		appContext = this;
 		//ActionBar gets initiated
 		ActionBar actionbar = getActionBar();
@@ -42,9 +48,11 @@ public class Books extends Activity {
 		OTTab.setTabListener(new MyTabsListener(OTFragment));
 		actionbar.addTab(OTTab);
 		actionbar.addTab(NTTab);
+		actionbar.setSelectedNavigationItem(currentTestament - 1);
 		}
 
 		@Override
+		
 		public boolean onCreateOptionsMenu(Menu menu) {
 			// Inflate the menu; this adds items to the action bar if it is present.
 			getMenuInflater().inflate(R.menu.boc_pup, menu);

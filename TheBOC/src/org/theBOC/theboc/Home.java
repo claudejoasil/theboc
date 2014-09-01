@@ -168,9 +168,8 @@ public class Home extends Activity {
 	     // update selected item and title, then close the drawer
 	        mDrawerList.setItemChecked(position, true);
 	        setTitle(navMenuTitles[position]);
-	        mDrawerLayout.closeDrawer(mDrawerList);
     	}
-        
+    	mDrawerLayout.closeDrawer(mDrawerList);
     }
 
     @Override

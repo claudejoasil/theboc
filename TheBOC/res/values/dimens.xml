@@ -9,6 +9,7 @@
     <dimen name="chapter_padding_right">5dp</dimen>
     <dimen name="chapter_padding_left">5dp</dimen>
     <dimen name="boc_default_listItem_height">48dp</dimen>
-    <dimen name="boc_default_gridItem_height">40dp</dimen>
-    <dimen name="boc_default_gridItem_width">40dp</dimen>
+    <dimen name="boc_default_gridItem_height">48dp</dimen>
+    <dimen name="boc_default_gridItem_width">48dp</dimen>
+    <dimen name="boc_default_gridItem_spacing">1dp</dimen>
 </resources>
