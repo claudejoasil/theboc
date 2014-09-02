@@ -12,6 +12,8 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.GradientDrawable.Orientation;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
@@ -19,7 +21,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.view.View;
 
-public class Versions extends Activity {
+public class Versions extends FragmentActivity {
 	private static org.theBOC.theboc.database.Version versionDB;
 	private ListView lstView;
 	private ArrayList<Version> versions;
@@ -49,10 +51,21 @@ public class Versions extends Activity {
 	        	  Version version = versions.get(position);
 	        	  if(!version.getIsGroupHeader())
 	        	  {
-	        		  sharedpreferences = getSharedPreferences(currentValues, Context.MODE_PRIVATE);
-	        		  sharedpreferences.edit().putInt(VersionId, version.getId()).apply();
-	        		  sharedpreferences.edit().putString(Language, version.getLanguage()).apply();
-	        		  ((Activity) context).finish();
+	        		  if(version.getIsAvailable())
+	        		  {
+		        		  sharedpreferences = getSharedPreferences(currentValues, Context.MODE_PRIVATE);
+		        		  sharedpreferences.edit().putInt(VersionId, version.getId()).apply();
+		        		  sharedpreferences.edit().putString(Language, version.getLanguage()).apply();
+		        		  ((Activity) context).finish();
+	        		  }
+	        		  else
+	        		  {
+	        			  VersionUnavailableDialFrag dialFrag = new VersionUnavailableDialFrag();
+	        			  String message = getResources().getString(R.string.version_unavailable);
+	        			  dialFrag.setDialogMessage(String.format(message, version.getName()));
+	        			  FragmentManager fragmentManager = getSupportFragmentManager();
+	        			  dialFrag.show(fragmentManager, "VERSION_NOT_AVAILABLE");
+	        		  }
 	        	  }
 	          }
 		});

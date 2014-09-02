@@ -5,6 +5,7 @@ public class Version {
 	private String language;
 	private String name;
 	private String shortName;
+	private boolean isAvailable;
 	private boolean isGroupHeader;
 	public Version(){}
 	public int getId()
@@ -46,5 +47,13 @@ public class Version {
 	public void setIsGroupHeader(boolean isGroupHeader)
 	{
 		this.isGroupHeader = isGroupHeader;
+	}
+	public boolean getIsAvailable()
+	{
+		return this.isAvailable;
+	}
+	public void setIsAvailable(boolean isAvailable)
+	{
+		this.isAvailable = isAvailable;
 	}
 }
