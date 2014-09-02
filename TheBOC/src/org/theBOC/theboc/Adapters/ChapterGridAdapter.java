@@ -5,6 +5,7 @@ import org.theBOC.theboc.R;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,6 +53,8 @@ public class ChapterGridAdapter extends BaseAdapter {
         if(selectedChapter - 1 == position)
         {
         	convertView.setBackgroundColor(0xFFFAFAFA);
+        	txtText.setTypeface(null, Typeface.BOLD);
+        	txtText.setTextColor(0xFF813f15);
         }
         return convertView;
 	}

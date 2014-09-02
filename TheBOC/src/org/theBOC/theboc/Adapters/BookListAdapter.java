@@ -1,11 +1,11 @@
 package org.theBOC.theboc.Adapters;
 
 import java.util.ArrayList;
-import org.theBOC.theboc.Bible;
 import org.theBOC.theboc.R;
 import org.theBOC.theboc.Models.Book;
+
+import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +24,7 @@ public class BookListAdapter extends BaseExpandableListAdapter {
 	public static final String BookId = "bookIdKey";
 	public static final String Chapter = "chapterKey";
 	public static final String Language = "languageKey";
-	public static final String testament = "testamentKey";
+	public static final String Testament = "testamentKey";
 	
 	public BookListAdapter(Context context, ArrayList<Book> books)
 	{
@@ -93,7 +93,7 @@ public class BookListAdapter extends BaseExpandableListAdapter {
 		 final int SPACING = (int) parent.getContext().getResources().getDimension(R.dimen.boc_default_gridItem_spacing);
 		 final int COL_WIDTH = (int) parent.getContext().getResources().getDimension(R.dimen.chapter_column_width);
 		 final int ROW_HEIGHT = (int) parent.getContext().getResources().getDimension(R.dimen.boc_default_gridItem_height);
-		 final int PADDING = 0; //(int) parent.getContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
+		 //final int PADDING = (int) parent.getContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
 		 
 		 LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		 convertView = (ViewGroup) inflater.inflate(R.layout.activity_chapters, parent, false);
@@ -131,11 +131,14 @@ public class BookListAdapter extends BaseExpandableListAdapter {
 		 {
 	          public void onItemClick(AdapterView<?> parent, View view, int position, long id) 
 	          {
-	        	  sharedpreferences.edit().putInt(BookId, book.getBookId()).apply();
-	        	  sharedpreferences.edit().putInt(Chapter, position + 1).apply();
-	        	  sharedpreferences.edit().putInt(testament, book.getTestament()).apply();
-	        	  Intent bibleIntent = new Intent(theContext, Bible.class);
-	        	  parent.getContext().startActivity(bibleIntent);
+	        	  SharedPreferences.Editor ed = sharedpreferences.edit();
+	              ed.putInt(BookId, book.getBookId());
+	              ed.putInt(Chapter, position + 1);
+	              ed.putInt(Testament, book.getTestament());
+	              ed.commit();
+	        	  //Intent bibleIntent = new Intent(theContext, Bible.class);
+	        	  //parent.getContext().startActivity(bibleIntent);
+	        	  ((Activity)theContext).finish();
 	          } 
 		 });
 		 chapterGridView.getLayoutParams().height = gridHeight; 

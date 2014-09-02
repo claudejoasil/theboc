@@ -8,7 +8,6 @@ import org.theBOC.theboc.Models.Version;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.GradientDrawable.Orientation;
@@ -42,6 +41,7 @@ public class Versions extends Activity {
 		int[] colors = {0, 0xFFCCCCCC, 0}; 
 		lstView.setDivider(new GradientDrawable(Orientation.RIGHT_LEFT, colors));
 		lstView.setDividerHeight(1);
+		final Context context = this;
 		lstView.setOnItemClickListener(new OnItemClickListener() 
 		{
 	          public void onItemClick(AdapterView<?> parent, View view, int position, long id) 
@@ -52,8 +52,7 @@ public class Versions extends Activity {
 	        		  sharedpreferences = getSharedPreferences(currentValues, Context.MODE_PRIVATE);
 	        		  sharedpreferences.edit().putInt(VersionId, version.getId()).apply();
 	        		  sharedpreferences.edit().putString(Language, version.getLanguage()).apply();
-	        		  Intent bibleIntent = new Intent(Versions.this, Bible.class);
-	  	    	      startActivity(bibleIntent);
+	        		  ((Activity) context).finish();
 	        	  }
 	          }
 		});
@@ -78,8 +77,7 @@ public class Versions extends Activity {
 			return true;
 		}
 		if (id == R.id.action_cancel) {
-			Intent bibleIntent = new Intent(Versions.this, Bible.class);
-        	startActivity(bibleIntent);
+			this.finish();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

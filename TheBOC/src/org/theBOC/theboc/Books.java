@@ -34,7 +34,9 @@ public class Books extends Activity {
 		//Tell the ActionBar we want to use Tabs.
 		actionbar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		actionbar.setDisplayShowHomeEnabled(false);
-		actionbar.setTitle("Bible Books");
+		Intent i = getIntent();
+		String title = i.getStringExtra("ACTIVITY_TITLE");
+		actionbar.setTitle(title != null && !title.equals("") ? title : "Bible Books");
 		//initiating both tabs and set text to it.
 		ActionBar.Tab NTTab = actionbar.newTab().setText("New Testament");
 		ActionBar.Tab OTTab = actionbar.newTab().setText("Old Testament");
@@ -69,8 +71,9 @@ public class Books extends Activity {
 				return true;
 			}
 			if (id == R.id.action_cancel) {
-				Intent bibleIntent = new Intent(Books.this, Bible.class);
-	        	startActivity(bibleIntent);
+				this.finish();
+				//Intent bibleIntent = new Intent(Books.this, Bible.class);
+	        	//startActivity(bibleIntent);
 				return true;
 			}
 			return super.onOptionsItemSelected(item);
