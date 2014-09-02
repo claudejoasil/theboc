@@ -22,6 +22,7 @@ public class Bible extends Activity {
 	public static final String Verse = "verseKey"; 
 	public static final String VersionId = "versionIdKey";
 	public static final String Language = "languageKey";
+	public static final String TextSize = "textSizeKey";
 	public static final int lastBookId = 66;
 	public int currentBookId;
 	public int currentChapter;
@@ -42,19 +43,47 @@ public class Bible extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_bible);
-		if(this.currentBookId <= 0)
-			this.setCurrentValues(-1);
 		lstView = (ListView) findViewById(R.id.lst_bible_verses);
-		this.initDB();		
-		ArrayList<org.theBOC.theboc.Models.Bible> verses = bibleDB.getVerses(this.currentBookId, this.currentChapter, this.currentVersionObj.getShortName());		
-		m_textSize = m_textSize <= 0 ? (int)this.getResources().getDimension(R.dimen.bible_Default_text_size) : m_textSize;
-		this.bindBible(verses, 0);
+		this.initDB();	
+		sharedpreferences = getSharedPreferences(currentValues, Context.MODE_PRIVATE);
+		m_textSize = m_textSize <= 0 ? 
+				sharedpreferences.getInt(TextSize, (int)this.getResources().getDimension(R.dimen.bible_Default_text_size)) : 
+				m_textSize;
 		ActionBar actionBar = getActionBar();
 		//actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setDisplayShowTitleEnabled(false);
 		actionBar.setIcon(R.drawable.ic_bible);		
 	}
-
+    @Override
+    protected void onResume() {
+    	super.onResume();
+    	this.setCurrentValues(-1);
+    	ArrayList<org.theBOC.theboc.Models.Bible> verses = bibleDB.getVerses(this.currentBookId, this.currentChapter, this.currentVersionObj.getShortName());		
+    	this.updateActionTitles();
+    	this.bindBible(verses, 0);
+    }
+	@Override
+	 protected void onStop(){
+        super.onStop();
+        SharedPreferences.Editor ed = sharedpreferences.edit();
+        ed.putInt(BookId, this.currentBookId);
+        ed.putInt(Chapter, this.currentChapter);
+        ed.putInt(Verse, this.currentVerse);
+        ed.putInt(VersionId, this.currentVersionId);
+        ed.putInt(TextSize, m_textSize);
+        ed.commit();
+    }
+	@Override
+	protected void onPause() {
+        super.onPause();
+        SharedPreferences.Editor ed = sharedpreferences.edit();
+        ed.putInt(BookId, this.currentBookId);
+        ed.putInt(Chapter, this.currentChapter);
+        ed.putInt(Verse, this.currentVerse);
+        ed.putInt(VersionId, this.currentVersionId);
+        ed.putInt(TextSize, m_textSize);
+        ed.commit();
+    }
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -71,6 +100,7 @@ public class Bible extends Activity {
         switch(item.getItemId()) {
         case R.id.action_bible_book_chapter:
         	Intent bookIntent = new Intent(Bible.this, Books.class);
+        	bookIntent.putExtra("ACTIVITY_TITLE", this.currentBookObj.getName() + " " +  this.currentChapter);
     		startActivity(bookIntent);
             return true;
         case R.id.action_bible_version:
@@ -117,7 +147,6 @@ public class Bible extends Activity {
 	}
 	private void setCurrentValues(int bookId)
 	{
-		sharedpreferences = getSharedPreferences(currentValues, Context.MODE_PRIVATE);
 		this.currentVersionId = sharedpreferences.getInt(VersionId, 4);
 		if(versionDB == null)
 			versionDB = new org.theBOC.theboc.database.Version(this);
