@@ -17,7 +17,7 @@ public class Version {
 	{
 		SQLiteDatabase db = bocDB.getReadableDatabase();
 		SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-		String [] sqlSelect = {"ZID", "ZLANGUAGE", "ZNAME", "ZSHORTNAME"}; 
+		String [] sqlSelect = {"ZID", "ZLANGUAGE", "ZNAME", "ZSHORTNAME, ZISAVAILABLE"}; 
 		String sqlTables = "ZBIBLEVERSIONS";
 		String where = null;
 		if(language != null && language != "")
@@ -46,15 +46,17 @@ public class Version {
 	                version.setLanguage(c.getString(1));
 	                version.setName(c.getString(2));
 	                version.setShortName(c.getString(3));
+	                version.setIsAvailable(c.getInt(4) == 0 ? false : true);
 	                versions.add(version);
 	            } while (c.moveToNext());
 			} else {			
 	            do {
 	            	org.theBOC.theboc.Models.Version version = new org.theBOC.theboc.Models.Version();
-	                version.setId(Integer.parseInt(c.getString(0)));
+	                version.setId(c.getInt(0));
 	                version.setLanguage(c.getString(1));
 	                version.setName(c.getString(2));
 	                version.setShortName(c.getString(3));
+	                version.setIsAvailable(c.getInt(4) == 0 ? false : true);
 	                versions.add(version);
 	            } while (c.moveToNext());
 			}
@@ -65,7 +67,7 @@ public class Version {
 	{
 		SQLiteDatabase db = bocDB.getReadableDatabase();
 		SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-		String [] sqlSelect = {"ZID", "ZLANGUAGE", "ZNAME", "ZSHORTNAME"}; 
+		String [] sqlSelect = {"ZID", "ZLANGUAGE", "ZNAME", "ZSHORTNAME, ZISAVAILABLE"}; 
 		String sqlTables = "ZBIBLEVERSIONS";
 		String where = null;
 		if(Id > 0)
@@ -86,10 +88,12 @@ public class Version {
 		org.theBOC.theboc.Models.Version version = new org.theBOC.theboc.Models.Version();
 		if (c.moveToFirst()) {	           
             	version = new org.theBOC.theboc.Models.Version();
-            	version.setId(Integer.parseInt(c.getString(0)));
+            	version.setId(c.getInt(0));
                 version.setLanguage(c.getString(1));
                 version.setName(c.getString(2));
-                version.setShortName(c.getString(3));        }
+                version.setShortName(c.getString(3));   
+                version.setIsAvailable(c.getInt(4) == 0 ? false : true);
+        }
 		return version;
 	}
 }

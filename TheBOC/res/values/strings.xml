@@ -39,5 +39,7 @@
     <string name="new_testament">New Testament</string>
     <string name="old_testament">Old Testament</string>
     <string name="title_activity_versions">Versions</string>
-
+	<string name="download">Download</string>
+	<string name="cancel">Cancel</string>
+	<string name="version_unavailable">Version \'%1$s\' is not available offline. Would you like to download this version now?</string>
 </resources>
