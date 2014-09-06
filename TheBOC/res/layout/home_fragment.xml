@@ -1,8 +1,84 @@
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-		android:id="@+id/txtTest"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Home" >
+    <LinearLayout
+        android:id="@+id/latest_reading_box"
         android:layout_width="match_parent"
-	    android:layout_height="match_parent"
-	    android:background="#FFFFFF"
-	    android:gravity="center"
-	    android:padding="32dp"
-        android:text="@string/app_not_available" />
+        android:layout_height="48dp"
+        android:layout_alignParentTop="true"
+        android:background="#E0E0E0"
+        android:orientation="horizontal"
+        android:onClick="gotoBible">
+        
+	    <ImageView
+        android:layout_width="25dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:contentDescription="@string/desc_list_item_icon"
+        android:src="@drawable/ic_bible" />
+
+    	<TextView
+        android:id="@+id/latest_bible_reading"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:minHeight="?android:attr/listPreferredItemHeightSmall"
+        android:textAppearance="?android:attr/textAppearanceListItemSmall"
+        android:textColor="@color/textviewcolor"
+        android:textSize="14sp"
+        android:gravity="center_vertical"/>
+        
+	</LinearLayout>
+	<LinearLayout 
+		android:id="@+id/event_countdown_box"
+		android:layout_below="@+id/latest_reading_box"
+		android:orientation="horizontal"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:background="@drawable/gray_border"
+		android:layout_marginTop="10dp"
+		android:layout_marginRight="@dimen/activity_horizontal_margin"
+		android:layout_marginLeft="@dimen/activity_horizontal_margin">
+	 	<FrameLayout 
+	 	    android:layout_width="match_parent"
+	 		android:layout_height="wrap_content"
+	 		android:background="#FAFAFA"
+	 		android:padding="@dimen/activity_horizontal_margin">
+	 	     <TextView
+		        android:layout_width="wrap_content"
+		        android:layout_height="match_parent"
+		        android:minHeight="?android:attr/listPreferredItemHeightSmall"
+		        android:textAppearance="?android:attr/textAppearanceListItemSmall"
+		        android:textColor="@color/textviewcolor"
+		        android:gravity="center_vertical"
+		        android:text="Event Countdown"/> 
+	 	</FrameLayout>
+	</LinearLayout>
+	<LinearLayout 
+android:id="@+id/daily_verse_box"
+android:layout_below="@+id/event_countdown_box"
+android:orientation="horizontal"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:background="@drawable/gray_border"
+android:layout_marginTop="10dp"
+android:layout_marginRight="@dimen/activity_horizontal_margin"
+android:layout_marginLeft="@dimen/activity_horizontal_margin">
+	 	<FrameLayout 
+	 	    android:layout_width="match_parent"
+	 		android:layout_height="wrap_content"
+	 		android:background="#FAFAFA"
+	 		android:padding="@dimen/activity_horizontal_margin">
+	 	     <TextView
+		        android:layout_width="wrap_content"
+		        android:layout_height="match_parent"
+		        android:minHeight="?android:attr/listPreferredItemHeightSmall"
+		        android:textAppearance="?android:attr/textAppearanceListItemSmall"
+		        android:textColor="@color/textviewcolor"
+		        android:gravity="center_vertical"
+		        android:text="Verse of the day"/> 
+	 	</FrameLayout>
+	</LinearLayout>
+</RelativeLayout>

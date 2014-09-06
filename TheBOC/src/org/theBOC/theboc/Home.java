@@ -54,6 +54,7 @@ public class Home extends Activity {
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1)));
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[3], navMenuIcons.getResourceId(3, -1), true, "22"));
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[4], navMenuIcons.getResourceId(4, -1)));
 
 		// Recycle the typed array
 		navMenuIcons.recycle();		
@@ -157,6 +158,8 @@ public class Home extends Activity {
 	    	case 1:
 	    		Intent bibleIntent = new Intent(Home.this, Bible.class);
 	    		startActivity(bibleIntent);
+	    	case 4:
+	    		this.finish();
 	    		break;
 			default:
 				frag = new HomeFragment();
@@ -178,6 +181,12 @@ public class Home extends Activity {
         getActionBar().setTitle(mTitle);
     }
 
+
+	public void gotoBible(View view)
+	{
+		Intent bibleIntent = new Intent(Home.this, Bible.class);
+		startActivity(bibleIntent);
+	}
     /**
      * When using the ActionBarDrawerToggle, you must call it during
      * onPostCreate() and onConfigurationChanged()...

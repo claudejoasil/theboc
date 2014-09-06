@@ -12,6 +12,7 @@
         <item>BOC Songs</item>
         <item>BOC Events</item>
         <!-- <item>BOC Multimedia</item> -->
+        <item>Exit</item>
     </string-array>
 
     <array name="menu_icons">
@@ -22,6 +23,7 @@
         <item>@drawable/ic_song</item>
         <item>@drawable/ic_event</item>
         <!-- <item>@drawable/ic_home</item> -->
+        <item>@drawable/ic_exit</item>
     </array>
 
     <string name="drawer_open">Open navigation drawer</string>
@@ -41,5 +43,5 @@
     <string name="title_activity_versions">Versions</string>
 	<string name="download">Download</string>
 	<string name="cancel">Cancel</string>
-	<string name="version_unavailable">Version \'%1$s\' is not available offline. Would you like to download this version now?</string>
+	<string name="version_unavailable">\'%1$s\' is not available offline. Download now?</string>
 </resources>
