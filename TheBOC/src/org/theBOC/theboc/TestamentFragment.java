@@ -3,10 +3,9 @@ package org.theBOC.theboc;
 import java.util.ArrayList;
 
 import org.theBOC.theboc.Adapters.BookListAdapter;
+import org.theBOC.theboc.common.BibleHelper;
 
 import android.app.Fragment;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.GradientDrawable.Orientation;
 import android.os.Bundle;
@@ -21,12 +20,8 @@ public class TestamentFragment extends Fragment {
 	private int theTestament;
 	private static org.theBOC.theboc.database.Book bookDB;
 	private ArrayList<org.theBOC.theboc.Models.Book> books;
-	private SharedPreferences sharedpreferences;
-	public static final String currentValues = "BibleCurrentValues";
+	private BibleHelper bibleHelper;
 	private int lastExpandedPosition = -1;
-	public static final String Language = "languageKey";
-	public static final String BookId = "bookIdKey"; 
-	public static final String Testament = "testamentKey"; 
 	public TestamentFragment(){
 		
 	}
@@ -39,10 +34,9 @@ public class TestamentFragment extends Fragment {
     	int NUM_OLD_TESTAMENT_BOOKS = 39;
     	if(bookDB == null)
     		bookDB = new org.theBOC.theboc.database.Book(this.getActivity());
-    	sharedpreferences = this.getActivity().getSharedPreferences(currentValues, Context.MODE_PRIVATE);
-    	String language = sharedpreferences.getString(Language, "");
-    	int currentBookId = sharedpreferences.getInt(BookId, 0);
-    	int currentTestament = sharedpreferences.getInt(Testament, 0);
+    	bibleHelper = BibleHelper.getInstance(this.getActivity());
+    	String language = bibleHelper.getCurrentLanguage("");
+    	//int currentBookId = bibleHelper.getCurrentBookId(0);
 		books = bookDB.getBooks(this.theTestament, language);
 		View frag = inflater.inflate(R.layout.testament_fragment, container, false);
 		lstView = (ExpandableListView) frag.findViewById(R.id.lst_books);
@@ -63,16 +57,16 @@ public class TestamentFragment extends Fragment {
 		
 		BookListAdapter adt = new BookListAdapter(this.getActivity(), books);
 		lstView.setAdapter(adt);
-		if(currentBookId > 0) {
+		if(bibleHelper.getCurrentBookId(0) > 0) {
 			int position;
-			if(currentBookId > NUM_OLD_TESTAMENT_BOOKS && currentTestament == this.theTestament)
+			if(bibleHelper.getCurrentBookId(0) > NUM_OLD_TESTAMENT_BOOKS && bibleHelper.getCurrentTestament(0) == this.theTestament)
 			{
-				position = currentBookId - NUM_OLD_TESTAMENT_BOOKS - 1;
+				position = bibleHelper.getCurrentBookId(0) - NUM_OLD_TESTAMENT_BOOKS - 1;
 				lstView.expandGroup(position, true);
 			}
-			if(currentBookId <= NUM_OLD_TESTAMENT_BOOKS && currentTestament == this.theTestament)
+			if(bibleHelper.getCurrentBookId(0) <= NUM_OLD_TESTAMENT_BOOKS && bibleHelper.getCurrentTestament(0) == this.theTestament)
 			{
-				position = currentBookId - 1;
+				position = bibleHelper.getCurrentBookId(0) - 1;
 				lstView.expandGroup(position, true);
 			}
 		}

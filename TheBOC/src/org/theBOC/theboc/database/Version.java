@@ -1,21 +1,17 @@
 package org.theBOC.theboc.database;
 import java.util.ArrayList;
-
-import org.theBOC.theboc.BOCdb;
+import java.util.Locale;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
-public class Version {
-	private BOCdb bocDB;
+public class Version extends DbBase {
 	public Version(Context context)
 	{
-		bocDB = BOCdb.getInstance(context);
+		super(context);
 	}
 	
 	public ArrayList<org.theBOC.theboc.Models.Version> getVersions(String language, boolean withHeader) 
 	{
-		SQLiteDatabase db = bocDB.getReadableDatabase();
 		SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 		String [] sqlSelect = {"ZID", "ZLANGUAGE", "ZNAME", "ZSHORTNAME, ZISAVAILABLE"}; 
 		String sqlTables = "ZBIBLEVERSIONS";
@@ -25,7 +21,7 @@ public class Version {
 			where = "ZLANGUAGE=" + language;
 		}
 		qb.setTables(sqlTables);
-		Cursor c = qb.query(db, sqlSelect, where, null, null, null, null);
+		Cursor c = qb.query(DB, sqlSelect, where, null, null, null, null);
 		c.moveToFirst();
 		ArrayList<org.theBOC.theboc.Models.Version> versions = new ArrayList<org.theBOC.theboc.Models.Version>();
 		if (c.moveToFirst()) {
@@ -65,7 +61,6 @@ public class Version {
 	}
 	public org.theBOC.theboc.Models.Version getVersion(int Id, String ShortName) 
 	{
-		SQLiteDatabase db = bocDB.getReadableDatabase();
 		SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 		String [] sqlSelect = {"ZID", "ZLANGUAGE", "ZNAME", "ZSHORTNAME, ZISAVAILABLE"}; 
 		String sqlTables = "ZBIBLEVERSIONS";
@@ -83,7 +78,7 @@ public class Version {
 			return null;
 		}
 		qb.setTables(sqlTables);
-		Cursor c = qb.query(db, sqlSelect, where, null, null, null, null);
+		Cursor c = qb.query(DB, sqlSelect, where, null, null, null, null);
 		c.moveToFirst();
 		org.theBOC.theboc.Models.Version version = new org.theBOC.theboc.Models.Version();
 		if (c.moveToFirst()) {	           
@@ -95,5 +90,34 @@ public class Version {
                 version.setIsAvailable(c.getInt(4) == 0 ? false : true);
         }
 		return version;
+	}
+	
+	public void createBibleVersion(String versionName) 
+	{
+		if(versionName == null || versionName.equalsIgnoreCase(""))
+				return;
+		String tableName = "ZBIBLE" + versionName.toUpperCase(Locale.ENGLISH);
+		String query = "CREATE TABLE IF NOT EXISTS " + tableName + 
+				" (Z_PK INTEGER PRIMARY KEY, Z_ENT INTEGER, Z_OPT INTEGER, ZBOOKID INTEGER, ZCHAPTER INTEGER, ZVERSE  INTEGER, ZBOOK VARCHAR, ZVERSETEXT TEXT)";
+		try
+		{
+			DB.execSQL(query);
+		}
+		catch(Exception ex)
+		{
+			//Error occurred
+		}
+	}
+	public void setVersionAvailable(int versionId)
+	{
+		String query = "UPDATE ZBIBLEVERSIONS SET ZISAVAILABLE = 1 WHERE ZID=" + versionId;
+		try
+		{
+			DB.execSQL(query);
+		}
+		catch(Exception ex)
+		{
+			//Error occurred
+		}
 	}
 }

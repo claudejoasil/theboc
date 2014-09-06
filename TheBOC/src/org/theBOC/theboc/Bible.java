@@ -3,34 +3,26 @@ package org.theBOC.theboc;
 import java.util.ArrayList;
 
 import org.theBOC.theboc.Adapters.VerseListAdapter;
+import org.theBOC.theboc.common.BibleHelper;
 
 import android.os.Bundle;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.AdapterView.OnItemClickListener;
 
 public class Bible extends Activity {
 	public static final String currentValues = "BibleCurrentValues";
-	public static final String BookId = "bookIdKey"; 
-	public static final String Chapter = "chapterKey"; 
-	public static final String Verse = "verseKey"; 
-	public static final String VersionId = "versionIdKey";
-	public static final String Language = "languageKey";
-	public static final String TextSize = "textSizeKey";
 	public static final int lastBookId = 66;
-	public int currentBookId;
-	public int currentChapter;
-	public int currentVerse;
-	public int currentVersionId;
+	public static final int lastOldTestamentBookId = 39;
 	public org.theBOC.theboc.Models.Book currentBookObj;
 	public org.theBOC.theboc.Models.Version currentVersionObj;
-	private SharedPreferences sharedpreferences;
+	private BibleHelper bibleHelper;
 	private Menu menu;
 	private ListView lstView;
 	private static org.theBOC.theboc.database.Bible bibleDB;
@@ -43,11 +35,19 @@ public class Bible extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_bible);
+		bibleHelper = BibleHelper.getInstance(this);
 		lstView = (ListView) findViewById(R.id.lst_bible_verses);
+		lstView.setOnItemClickListener(new OnItemClickListener() 
+		{
+	          public void onItemClick(AdapterView<?> parent, View view, int position, long id) 
+	          {
+	        	  org.theBOC.theboc.Models.Bible verseObj = m_verses.get(position);
+	        	  bibleHelper.setCurrentVerse(verseObj.getVerse());
+	          }
+		});
 		this.initDB();	
-		sharedpreferences = getSharedPreferences(currentValues, Context.MODE_PRIVATE);
 		m_textSize = m_textSize <= 0 ? 
-				sharedpreferences.getInt(TextSize, (int)this.getResources().getDimension(R.dimen.bible_Default_text_size)) : 
+				bibleHelper.getCurrentTextSize((int)this.getResources().getDimension(R.dimen.bible_Default_text_size)) : 
 				m_textSize;
 		ActionBar actionBar = getActionBar();
 		//actionBar.setDisplayHomeAsUpEnabled(true);
@@ -58,38 +58,27 @@ public class Bible extends Activity {
     protected void onResume() {
     	super.onResume();
     	this.setCurrentValues(-1);
-    	ArrayList<org.theBOC.theboc.Models.Bible> verses = bibleDB.getVerses(this.currentBookId, this.currentChapter, this.currentVersionObj.getShortName());		
+    	ArrayList<org.theBOC.theboc.Models.Bible> verses = 
+    			bibleDB.getVerses(bibleHelper.getCurrentBookId(1), bibleHelper.getCurrentChapter(1), this.currentVersionObj.getShortName());		
     	this.updateActionTitles();
     	this.bindBible(verses, 0);
     }
 	@Override
 	 protected void onStop(){
         super.onStop();
-        SharedPreferences.Editor ed = sharedpreferences.edit();
-        ed.putInt(BookId, this.currentBookId);
-        ed.putInt(Chapter, this.currentChapter);
-        ed.putInt(Verse, this.currentVerse);
-        ed.putInt(VersionId, this.currentVersionId);
-        ed.putInt(TextSize, m_textSize);
-        ed.commit();
+        bibleHelper.persistCurrentValues();
     }
 	@Override
 	protected void onPause() {
         super.onPause();
-        SharedPreferences.Editor ed = sharedpreferences.edit();
-        ed.putInt(BookId, this.currentBookId);
-        ed.putInt(Chapter, this.currentChapter);
-        ed.putInt(Verse, this.currentVerse);
-        ed.putInt(VersionId, this.currentVersionId);
-        ed.putInt(TextSize, m_textSize);
-        ed.commit();
+        bibleHelper.persistCurrentValues();
     }
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.bible, menu);
 		this.menu = menu;
-		if(this.currentBookId <= 0)
+		if(bibleHelper.getCurrentBookId(0) <= 0)
 			this.setCurrentValues(-1);
 		this.updateActionTitles();
 		return true;
@@ -100,7 +89,7 @@ public class Bible extends Activity {
         switch(item.getItemId()) {
         case R.id.action_bible_book_chapter:
         	Intent bookIntent = new Intent(Bible.this, Books.class);
-        	bookIntent.putExtra("ACTIVITY_TITLE", this.currentBookObj.getName() + " " +  this.currentChapter);
+        	bookIntent.putExtra("ACTIVITY_TITLE", this.currentBookObj.getName() + " " +  bibleHelper.getCurrentChapter(1));
     		startActivity(bookIntent);
             return true;
         case R.id.action_bible_version:
@@ -110,22 +99,33 @@ public class Bible extends Activity {
         case R.id.action_previous:
         	if(bibleDB == null)
         		bibleDB = new org.theBOC.theboc.database.Bible(this);
-        	if(this.currentChapter > 1)
-        		this.currentChapter--; 
+        	if(bibleHelper.getCurrentChapter(1) > 1)
+        		bibleHelper.incrementChapter(-1);
         	else
+        	{
+        		bibleHelper.incrementChapter(-2); //SET Chapter to -1 at this point chapter is 1
+        		if(this.currentBookObj.getBookId() == lastOldTestamentBookId + 1)
+        			bibleHelper.setCurrentTestament(1);
         		this.setCurrentValues(this.currentBookObj.getBookId() - 1);
-    		ArrayList<org.theBOC.theboc.Models.Bible> verses1 = bibleDB.getVerses(this.currentBookId, this.currentChapter, this.currentVersionObj.getShortName());
+        	}
+    		ArrayList<org.theBOC.theboc.Models.Bible> verses1 = 
+    				bibleDB.getVerses(bibleHelper.getCurrentBookId(0), bibleHelper.getCurrentChapter(0), this.currentVersionObj.getShortName());
     		this.bindBible(verses1, 0);
     		this.updateActionTitles();
     		return true;
         case R.id.action_next:
         	if(bibleDB == null)
         		bibleDB = new org.theBOC.theboc.database.Bible(this);
-        	if(this.currentChapter + 1 <= this.currentBookObj.getNumChapters())
-        		this.currentChapter++;
+        	if(bibleHelper.getCurrentChapter(0) + 1 <= this.currentBookObj.getNumChapters())
+        		bibleHelper.incrementChapter(1);
         	else
-        		this.setCurrentValues(this.currentBookObj.getBookId() + 1);        		 
-    		ArrayList<org.theBOC.theboc.Models.Bible> verses = bibleDB.getVerses(this.currentBookId, this.currentChapter, this.currentVersionObj.getShortName());
+        	{
+        		if(this.currentBookObj.getBookId() == lastOldTestamentBookId)
+        			bibleHelper.setCurrentTestament(2);
+        		this.setCurrentValues(this.currentBookObj.getBookId() + 1);  
+        	}
+    		ArrayList<org.theBOC.theboc.Models.Bible> verses = 
+    				bibleDB.getVerses(bibleHelper.getCurrentBookId(0), bibleHelper.getCurrentChapter(0), this.currentVersionObj.getShortName());
     		this.bindBible(verses, 0);
     		this.updateActionTitles();
     		return true;
@@ -147,42 +147,49 @@ public class Bible extends Activity {
 	}
 	private void setCurrentValues(int bookId)
 	{
-		this.currentVersionId = sharedpreferences.getInt(VersionId, 4);
 		if(versionDB == null)
 			versionDB = new org.theBOC.theboc.database.Version(this);
-		this.currentVersionObj = versionDB.getVersion(this.currentVersionId, null);
+		this.currentVersionObj = versionDB.getVersion(bibleHelper.getCurrentVersionId(4), null);
 		
 		if(bookDB == null)
 			bookDB = new org.theBOC.theboc.database.Book(this);
 		if(bookId == -1)
 		{
-			this.currentBookId = sharedpreferences.getInt(BookId, 1);
-			this.currentBookObj = bookDB.getBook(this.currentBookId, this.currentVersionObj.getLanguage());
-			this.currentChapter = sharedpreferences.getInt(Chapter, 1);
-			this.currentVerse = sharedpreferences.getInt(Verse, 1);
+			bibleHelper.getCurrentBookId(1);
+			this.currentBookObj = bookDB.getBook(bibleHelper.getCurrentBookId(1), this.currentVersionObj.getLanguage());
+			bibleHelper.getCurrentChapter(1);
+			bibleHelper.getCurrentVerse(1);
 		}			
 		else
 		{			
 			if(bookId > lastBookId)
 			{
 				bookId = 1;
+				bibleHelper.setCurrentTestament(1);
 				this.currentBookObj = bookDB.getBook(bookId, this.currentVersionObj.getLanguage());
-				this.currentChapter = 1;
+				bibleHelper.setCurrentChapter(1);
 			}
 			else if(bookId <= 0)
 			{
 				bookId = lastBookId;
+				bibleHelper.setCurrentTestament(2);
 				this.currentBookObj = bookDB.getBook(bookId, this.currentVersionObj.getLanguage());
-				this.currentChapter = this.currentBookObj.getNumChapters();
+				bibleHelper.setCurrentChapter(this.currentBookObj.getNumChapters());
+			}
+			else if(bibleHelper.getCurrentChapter(1) == -1)
+			{
+				this.currentBookObj = bookDB.getBook(bookId, this.currentVersionObj.getLanguage());
+				bibleHelper.setCurrentChapter(this.currentBookObj.getNumChapters());
 			}
 			else
 			{
 				this.currentBookObj = bookDB.getBook(bookId, this.currentVersionObj.getLanguage());
-				this.currentChapter = 1;
+				bibleHelper.setCurrentChapter(1);
 			}
-			this.currentBookId = bookId;
-			this.currentVerse = 1;
-		}		
+			bibleHelper.setCurrentBookId(bookId);
+			bibleHelper.setCurrentVerse(1);
+		}
+		bibleHelper.setCurrentBookName(this.currentBookObj.getName());
 	}
 	private void updateActionTitles()
 	{
@@ -190,7 +197,7 @@ public class Bible extends Activity {
 		{
 			MenuItem itemBookChapter = menu.findItem(R.id.action_bible_book_chapter);
 			MenuItem itemVersion = menu.findItem(R.id.action_bible_version);
-			itemBookChapter.setTitle(this.currentBookObj.getName() + " " +  this.currentChapter);
+			itemBookChapter.setTitle(this.currentBookObj.getName() + " " +  bibleHelper.getCurrentChapter(1));
 			itemVersion.setTitle(this.currentVersionObj.getShortName());
 		}
 	}

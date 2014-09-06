@@ -1,6 +1,8 @@
 package org.theBOC.theboc;
 
 
+import org.theBOC.theboc.common.BibleHelper;
+
 import android.os.Bundle;
 import android.app.ActionBar.Tab;
 import android.app.Activity;
@@ -15,10 +17,6 @@ import android.view.MenuItem;
 
 public class Books extends Activity {
 	public static Context appContext;
-	public static final String BookId = "bookIdKey";
-	public static final String Chapter = "chapterKey";
-	public static final String Language = "languageKey";
-	public static final String testament = "testamentKey";
 	private SharedPreferences sharedpreferences;
 	public static final String currentValues = "BibleCurrentValues";
 	/** Called when the activity is first created. */
@@ -27,7 +25,7 @@ public class Books extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_books);
 		sharedpreferences = getSharedPreferences(currentValues, Context.MODE_PRIVATE);
-		int currentTestament = sharedpreferences.getInt(testament, 1);
+		int currentTestament = sharedpreferences.getInt(BibleHelper.Testament, 1);
 		appContext = this;
 		//ActionBar gets initiated
 		ActionBar actionbar = getActionBar();

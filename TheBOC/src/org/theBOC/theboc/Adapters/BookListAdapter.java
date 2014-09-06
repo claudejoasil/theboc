@@ -3,10 +3,10 @@ package org.theBOC.theboc.Adapters;
 import java.util.ArrayList;
 import org.theBOC.theboc.R;
 import org.theBOC.theboc.Models.Book;
+import org.theBOC.theboc.common.BibleHelper;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,8 +19,7 @@ import android.widget.TextView;
 public class BookListAdapter extends BaseExpandableListAdapter {
 	private Context context;
 	private ArrayList<Book> books;
-	private SharedPreferences sharedpreferences;
-	public static final String currentValues = "BibleCurrentValues";
+	private BibleHelper bibleHelper;
 	public static final String BookId = "bookIdKey";
 	public static final String Chapter = "chapterKey";
 	public static final String Language = "languageKey";
@@ -100,9 +99,9 @@ public class BookListAdapter extends BaseExpandableListAdapter {
 		 chapterGridView = (GridView) convertView.findViewById(R.id.gridview);
 		 chapterGridView.setVerticalSpacing(SPACING);
 		 chapterGridView.setHorizontalSpacing(SPACING);
-		 sharedpreferences = this.context.getSharedPreferences(currentValues, Context.MODE_PRIVATE);
-		 int currentChapter = sharedpreferences.getInt(Chapter, 0);
-		 int currentBookId = sharedpreferences.getInt(BookId, 0);
+		 bibleHelper = BibleHelper.getInstance(this.context);
+		 int currentChapter = bibleHelper.getCurrentChapter(0);
+		 int currentBookId = bibleHelper.getCurrentBookId(0);
 		 if(book.getBookId() != currentBookId)
 		 {
 			 currentChapter = 0;
@@ -131,13 +130,9 @@ public class BookListAdapter extends BaseExpandableListAdapter {
 		 {
 	          public void onItemClick(AdapterView<?> parent, View view, int position, long id) 
 	          {
-	        	  SharedPreferences.Editor ed = sharedpreferences.edit();
-	              ed.putInt(BookId, book.getBookId());
-	              ed.putInt(Chapter, position + 1);
-	              ed.putInt(Testament, book.getTestament());
-	              ed.commit();
-	        	  //Intent bibleIntent = new Intent(theContext, Bible.class);
-	        	  //parent.getContext().startActivity(bibleIntent);
+	        	  bibleHelper.setCurrentBookId(book.getBookId());
+	              bibleHelper.setCurrentChapter(position + 1);
+	              bibleHelper.setCurrentTestament(book.getTestament());
 	        	  ((Activity)theContext).finish();
 	          } 
 		 });
