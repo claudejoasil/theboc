@@ -36,7 +36,6 @@ public class TestamentFragment extends Fragment {
     		bookDB = new org.theBOC.theboc.database.Book(this.getActivity());
     	bibleHelper = BibleHelper.getInstance(this.getActivity());
     	String language = bibleHelper.getCurrentLanguage("");
-    	//int currentBookId = bibleHelper.getCurrentBookId(0);
 		books = bookDB.getBooks(this.theTestament, language);
 		View frag = inflater.inflate(R.layout.testament_fragment, container, false);
 		lstView = (ExpandableListView) frag.findViewById(R.id.lst_books);
