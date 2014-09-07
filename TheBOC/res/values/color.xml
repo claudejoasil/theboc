@@ -8,4 +8,5 @@
     <color name="counter_text_color">#666666</color>
     <color name="list_view_devider">#DDDDDD</color>
     <color name="action_bar_bg">#8e3d08</color>
+    <color name="action_bar_tab_text_color">#8e3d08</color>
 </resources>

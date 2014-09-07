@@ -61,11 +61,11 @@ public class Versions extends FragmentActivity implements VersionUnavailableDial
 	          public void onItemClick(AdapterView<?> parent, View view, int position, long id) 
 	          {
 	        	  m_clickedVersion = versions.get(position);
+	        	  bibleHelper = BibleHelper.getInstance(context);
 	        	  if(!m_clickedVersion.getIsGroupHeader())
 	        	  {
 	        		  if(m_clickedVersion.getIsAvailable())
 	        		  {
-		        		  bibleHelper = BibleHelper.getInstance(context);
 		        		  bibleHelper.setCurrentVersionId(m_clickedVersion.getId());
 		        		  bibleHelper.setCurrentLanguage(m_clickedVersion.getLanguage());
 		        		  ((Activity) context).finish();
@@ -150,12 +150,15 @@ public class Versions extends FragmentActivity implements VersionUnavailableDial
 	            if (input!=null) {   
 	            	versionDB.beginTransaction();
 	            	versionDB.createBibleVersion(m_clickedVersion.getShortName());
-	                while ((str = reader.readLine()) != null) { 
+	            	 String sql = "INSERT INTO ZBible" + m_clickedVersion.getShortName() + 
+	            			 " (ZbookId, Zbook, Zchapter, Zverse, Zversetext) VALUES %1$s;";
+	                 while ((str = reader.readLine()) != null) { 
 	                	if (isCancelled()) {
 		                    input.close();
 		                    return null;
 		                }
-	                	versionDB.executeQuery(str);
+	                	String query = String.format(sql, str);
+	                	versionDB.executeQuery(query);
 	                	 //if (fileLength > 0) // only if total length is known
 	 	                   // publishProgress((int) (total * 100 / fileLength));
 	                } 
@@ -209,6 +212,7 @@ public class Versions extends FragmentActivity implements VersionUnavailableDial
 	        	versionDB.setVersionAvailable(m_clickedVersion.getId());
                 bibleHelper.setCurrentVersionId(m_clickedVersion.getId());
                 bibleHelper.setCurrentLanguage(m_clickedVersion.getLanguage());
+                Toast.makeText(context, m_clickedVersion.getName() + " installed!", Toast.LENGTH_LONG).show();
                 ((Activity) context).finish();
 	        }
 	    }
@@ -217,7 +221,7 @@ public class Versions extends FragmentActivity implements VersionUnavailableDial
 	@Override
 	public void onDialogPositiveClick(DialogFragment dialog) {
 		final InstallNewVersionTask newVersionTask = new InstallNewVersionTask(Versions.this);
-		  String versionUrl = "http://www.theboc.org/downloads/bibleHCV.sql";
+		  String versionUrl = "http://www.theboc.org/downloads/bible" + m_clickedVersion.getShortName() + ".sql";
 		  newVersionTask.execute(versionUrl);
 
 		  mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {

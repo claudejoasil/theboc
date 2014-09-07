@@ -1,13 +1,16 @@
 package org.theBOC.theboc;
-
 import java.util.ArrayList;
 
 import org.theBOC.theboc.Adapters.VerseListAdapter;
 import org.theBOC.theboc.common.BibleHelper;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,7 +24,7 @@ public class Bible extends Activity {
 	public static final int lastBookId = 66;
 	public static final int lastOldTestamentBookId = 39;
 	public org.theBOC.theboc.Models.Book currentBookObj;
-	public org.theBOC.theboc.Models.Version currentVersionObj;
+	public static org.theBOC.theboc.Models.Version currentVersionObj;
 	private BibleHelper bibleHelper;
 	private Menu menu;
 	private ListView lstView;
@@ -30,6 +33,7 @@ public class Bible extends Activity {
 	private static org.theBOC.theboc.database.Version versionDB;
 	private static ArrayList<org.theBOC.theboc.Models.Bible> m_verses;
 	private static int m_textSize;
+	ProgressDialog mProgressDialog;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,10 +62,8 @@ public class Bible extends Activity {
     protected void onResume() {
     	super.onResume();
     	this.setCurrentValues(-1);
-    	ArrayList<org.theBOC.theboc.Models.Bible> verses = 
-    			bibleDB.getVerses(bibleHelper.getCurrentBookId(1), bibleHelper.getCurrentChapter(1), this.currentVersionObj.getShortName());		
     	this.updateActionTitles();
-    	this.bindBible(verses, 0);
+    	this.bindBible(0);
     }
 	@Override
 	 protected void onStop(){
@@ -108,9 +110,7 @@ public class Bible extends Activity {
         			bibleHelper.setCurrentTestament(1);
         		this.setCurrentValues(this.currentBookObj.getBookId() - 1);
         	}
-    		ArrayList<org.theBOC.theboc.Models.Bible> verses1 = 
-    				bibleDB.getVerses(bibleHelper.getCurrentBookId(0), bibleHelper.getCurrentChapter(0), this.currentVersionObj.getShortName());
-    		this.bindBible(verses1, 0);
+    		this.bindBible(0);
     		this.updateActionTitles();
     		return true;
         case R.id.action_next:
@@ -124,9 +124,7 @@ public class Bible extends Activity {
         			bibleHelper.setCurrentTestament(2);
         		this.setCurrentValues(this.currentBookObj.getBookId() + 1);  
         	}
-    		ArrayList<org.theBOC.theboc.Models.Bible> verses = 
-    				bibleDB.getVerses(bibleHelper.getCurrentBookId(0), bibleHelper.getCurrentChapter(0), this.currentVersionObj.getShortName());
-    		this.bindBible(verses, 0);
+    		this.bindBible(0);
     		this.updateActionTitles();
     		return true;
         default:
@@ -138,10 +136,10 @@ public class Bible extends Activity {
 		switch(view.getId())
 		{
 			case R.id.btnMagnifyMinus:
-	        	this.bindBible(null, -2);
+	        	this.bindBible(-2);
 	            break;
 	        case R.id.btnMagnifyPlus: 
-	        	this.bindBible(null, 2);
+	        	this.bindBible(2);
 	            break;
 		}
 	}
@@ -149,14 +147,13 @@ public class Bible extends Activity {
 	{
 		if(versionDB == null)
 			versionDB = new org.theBOC.theboc.database.Version(this);
-		this.currentVersionObj = versionDB.getVersion(bibleHelper.getCurrentVersionId(4), null);
+		currentVersionObj = versionDB.getVersion(bibleHelper.getCurrentVersionId(4), null);
 		
 		if(bookDB == null)
 			bookDB = new org.theBOC.theboc.database.Book(this);
 		if(bookId == -1)
 		{
-			bibleHelper.getCurrentBookId(1);
-			this.currentBookObj = bookDB.getBook(bibleHelper.getCurrentBookId(1), this.currentVersionObj.getLanguage());
+			this.currentBookObj = bookDB.getBook(bibleHelper.getCurrentBookId(1), currentVersionObj.getLanguage());
 			bibleHelper.getCurrentChapter(1);
 			bibleHelper.getCurrentVerse(1);
 		}			
@@ -166,24 +163,24 @@ public class Bible extends Activity {
 			{
 				bookId = 1;
 				bibleHelper.setCurrentTestament(1);
-				this.currentBookObj = bookDB.getBook(bookId, this.currentVersionObj.getLanguage());
+				this.currentBookObj = bookDB.getBook(bookId, currentVersionObj.getLanguage());
 				bibleHelper.setCurrentChapter(1);
 			}
 			else if(bookId <= 0)
 			{
 				bookId = lastBookId;
 				bibleHelper.setCurrentTestament(2);
-				this.currentBookObj = bookDB.getBook(bookId, this.currentVersionObj.getLanguage());
+				this.currentBookObj = bookDB.getBook(bookId, currentVersionObj.getLanguage());
 				bibleHelper.setCurrentChapter(this.currentBookObj.getNumChapters());
 			}
 			else if(bibleHelper.getCurrentChapter(1) == -1)
 			{
-				this.currentBookObj = bookDB.getBook(bookId, this.currentVersionObj.getLanguage());
+				this.currentBookObj = bookDB.getBook(bookId, currentVersionObj.getLanguage());
 				bibleHelper.setCurrentChapter(this.currentBookObj.getNumChapters());
 			}
 			else
 			{
-				this.currentBookObj = bookDB.getBook(bookId, this.currentVersionObj.getLanguage());
+				this.currentBookObj = bookDB.getBook(bookId, currentVersionObj.getLanguage());
 				bibleHelper.setCurrentChapter(1);
 			}
 			bibleHelper.setCurrentBookId(bookId);
@@ -198,28 +195,72 @@ public class Bible extends Activity {
 			MenuItem itemBookChapter = menu.findItem(R.id.action_bible_book_chapter);
 			MenuItem itemVersion = menu.findItem(R.id.action_bible_version);
 			itemBookChapter.setTitle(this.currentBookObj.getName() + " " +  bibleHelper.getCurrentChapter(1));
-			itemVersion.setTitle(this.currentVersionObj.getShortName());
+			itemVersion.setTitle(currentVersionObj.getShortName());
 		}
 	}
-	private void bindBible(ArrayList<org.theBOC.theboc.Models.Bible> verses, int textSizeIncrement)
+	private void bindBible(int textSizeIncrement)
 	{
-		if(verses == null)
-		{
-			verses = m_verses;
-		}
-		else
-		{
-			m_verses = verses;
-		}
-		m_textSize += textSizeIncrement;
-		lstView.setDivider(null);		
-		VerseListAdapter adt = new VerseListAdapter(this, verses, (float)m_textSize);
-		lstView.setAdapter(adt);
+		mProgressDialog = new ProgressDialog(Bible.this);
+		mProgressDialog.setMessage("please wait...");
+		mProgressDialog.setIndeterminate(true);
+		mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		mProgressDialog.setCancelable(false);
+		final GetBibleVersesTask getBibleVersesTask = new GetBibleVersesTask(Bible.this);
+		getBibleVersesTask.execute(textSizeIncrement);
 	}
 	private void initDB()
 	{
 		bibleDB = new org.theBOC.theboc.database.Bible(this);
 		bookDB = new org.theBOC.theboc.database.Book(this);
 		versionDB = new org.theBOC.theboc.database.Version(this);
+	}
+	
+	private class GetBibleVersesTask extends AsyncTask<Integer, Integer, VerseListAdapter> {
+
+	    private Context context;
+	    private PowerManager.WakeLock mWakeLock;
+
+	    public GetBibleVersesTask(Context context) {
+	        this.context = context;
+	    }
+
+	    @Override
+	    protected VerseListAdapter doInBackground(Integer... textSize) {
+	        
+	    	if(textSize[0] == 0)
+				m_verses = bibleDB.getVerses(bibleHelper.getCurrentBookId(1), bibleHelper.getCurrentChapter(1), currentVersionObj.getShortName());
+	    	m_textSize += textSize[0];
+	    	VerseListAdapter adt = new VerseListAdapter(this.context, m_verses, (float)m_textSize);
+	    	return adt;
+	    }
+	    
+	    @Override
+	    protected void onPreExecute() {
+	        super.onPreExecute();
+	        // take CPU lock to prevent CPU from going off if the user 
+	        // presses the power button during download
+	        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+	        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+	             getClass().getName());
+	        mWakeLock.acquire();
+	        mProgressDialog.show();
+	    }
+
+	    @Override
+	    protected void onProgressUpdate(Integer... progress) {
+	        super.onProgressUpdate(progress);
+	        // if we get here, length is known, now set indeterminate to false
+	        mProgressDialog.setIndeterminate(false);
+	        mProgressDialog.setMax(100);
+	        mProgressDialog.setProgress(progress[0]);
+	    }
+
+	    @Override
+	    protected void onPostExecute(VerseListAdapter adt) {
+	        mWakeLock.release();
+	        mProgressDialog.dismiss();
+	        lstView.setDivider(null);		
+			lstView.setAdapter(adt);
+	    }
 	}
 }

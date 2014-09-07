@@ -11,22 +11,19 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.view.Menu;
 import android.view.MenuItem;
 
 public class Books extends Activity {
 	public static Context appContext;
-	private SharedPreferences sharedpreferences;
-	public static final String currentValues = "BibleCurrentValues";
+	private BibleHelper bibleHelper;
 	/** Called when the activity is first created. */
 	@Override
 		public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_books);
-		sharedpreferences = getSharedPreferences(currentValues, Context.MODE_PRIVATE);
-		int currentTestament = sharedpreferences.getInt(BibleHelper.Testament, 1);
 		appContext = this;
+		bibleHelper = BibleHelper.getInstance(appContext);
 		//ActionBar gets initiated
 		ActionBar actionbar = getActionBar();
 		//Tell the ActionBar we want to use Tabs.
@@ -48,7 +45,7 @@ public class Books extends Activity {
 		OTTab.setTabListener(new MyTabsListener(OTFragment));
 		actionbar.addTab(OTTab);
 		actionbar.addTab(NTTab);
-		actionbar.setSelectedNavigationItem(currentTestament - 1);
+		actionbar.setSelectedNavigationItem(bibleHelper.getCurrentTestament(1) - 1);
 		}
 
 		@Override

@@ -4,6 +4,7 @@ import org.theBOC.theboc.BOCdb;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 
 public class DbBase {
 	protected BOCdb bocDB;
@@ -28,5 +29,13 @@ public class DbBase {
 	public void executeQuery(String sql)
 	{
 		DB.execSQL(sql);
+	}
+	public SQLiteStatement compileStatement(String sql)
+	{
+		return DB.compileStatement(sql);
+	}
+	public void close()
+	{
+		DB.close();
 	}
 }
