@@ -2,7 +2,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Home" >
+    android:background="@drawable/home_pic_1" >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:paddingBottom="@dimen/activity_horizontal_margin"
+        >
     <LinearLayout
         android:id="@+id/latest_reading_box"
         android:layout_width="match_parent"
@@ -57,15 +63,15 @@
 	 	</FrameLayout>
 	</LinearLayout>
 	<LinearLayout 
-android:id="@+id/daily_verse_box"
-android:layout_below="@+id/event_countdown_box"
-android:orientation="horizontal"
-android:layout_width="match_parent"
-android:layout_height="wrap_content"
-android:background="@drawable/gray_border"
-android:layout_marginTop="10dp"
-android:layout_marginRight="@dimen/activity_horizontal_margin"
-android:layout_marginLeft="@dimen/activity_horizontal_margin">
+		android:id="@+id/daily_verse_box"
+		android:layout_below="@+id/event_countdown_box"
+		android:orientation="horizontal"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:background="@drawable/gray_border"
+		android:layout_marginTop="10dp"
+		android:layout_marginRight="@dimen/activity_horizontal_margin"
+		android:layout_marginLeft="@dimen/activity_horizontal_margin">
 	 	<FrameLayout 
 	 	    android:layout_width="match_parent"
 	 		android:layout_height="wrap_content"
@@ -81,4 +87,5 @@ android:layout_marginLeft="@dimen/activity_horizontal_margin">
 		        android:text="Verse of the day"/> 
 	 	</FrameLayout>
 	</LinearLayout>
+	</RelativeLayout>
 </RelativeLayout>
