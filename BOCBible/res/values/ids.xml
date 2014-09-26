@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="highLight_menu_item" type="id"/>
+    <item name="home_frag_id" type="id"/>
+    <item name="highLights_frag_id" type="id"/>
+    <item name="about_frag_id" type="id"/>
+</resources>
