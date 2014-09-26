@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">BOC Bible</string>
+    <string name="action_settings">Settings</string>
+
+    <string-array name="menu_Items">
+        <item>Home</item>
+        <item>Read the Bible</item>
+        <!-- <item>BOC Reading Plan</item> -->
+        <item>My Highlights</item>
+        <item>About</item>
+        <item>Exit</item>
+    </string-array>
+	<string-array name="highlight_options">
+        <item>Read Chapter</item>
+        <item>Clear Highlight</item>
+    </string-array>
+    <array name="menu_icons">
+        <item>@drawable/ic_home</item>
+        <item>@drawable/ic_bible</item>
+        <!-- <item>@drawable/ic_reading_plan</item> -->
+        <item>@drawable/ic_highlight</item>
+        <item>@drawable/ic_about</item>
+        <item>@drawable/ic_exit</item>
+    </array>
+
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="action_websearch">Web search</string>
+    <string name="app_not_available">Sorry, there\'s no web browser available</string>
+    <string name="title_activity_home_fragment">HomeFragment</string>
+    <string name="desc_list_item_icon">Item Icon</string>
+    <string name="the_bible">BOC Bible</string>
+    <string name="title_activity_bible">Bible</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="title_activity_books">Books</string>
+    <string name="new_testament">New Testament</string>
+    <string name="old_testament">Old Testament</string>
+    <string name="title_activity_versions">Versions</string>
+    <string name="download">Download</string>
+    <string name="cancel">Cancel</string>
+    <string name="start_reading">Start Reading</string>
+    <string name="ok">OK</string>
+    <string name="yes">Yes</string>
+    <string name="clear">Clear</string>
+    <string name="read_on">Read on</string>
+    <string name="unhighlight">Unhighlight</string>
+    <string name="version_unavailable">\'%1$s\' is not available offline. Download now?</string>
+    <string name="verse_of_the_week">Verse of the week</string>
+    <string name="title_activity_about">About</string>
+    <string name="author_version">Version: 1.1.0</string>
+    <string name="about_text">"BOC Bible" is a Christian Bible App. (A feature of theBOC.org) created by \"BOC Dev Bros.\"\n\nThe web version of the app can be found at http://www.theboc.org/bible/read/\n\n"BOC Bible" is currently available in four different languages ​​and eleven different versions. More languages ​​and versions will be added gradually. 
+With a very simple navigation, BOC Bible provides a very simple and intuitive user experience.\n\nWe have ensured that anyone with a basic Android experience can use the application without any problems.</string>
+    <string name="title_activity_hightlights_fragment">Hightlights</string>
+	<string name="no_highLights_found">You currently have no highlights for this version</string>
+</resources>
