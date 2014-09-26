@@ -1,0 +1,5 @@
+eclipse.preferences.version=1
+externalMigrateFromAuthorizationDatabase/isMigrated=true
+migrateFromAuthorizationDatabase/isMigrated=true
+repositories/104c51a8c62500141b3681d2398fb5e6=104c51a8c62500141b3681d2398fb5e6;https\://theboc.googlecode.com/svn/;https\://theboc.googlecode.com/svn/trunk/;branches;tags;trunk;true;4229e89a-cad6-7d9b-ad1d-ea27c5726503;https\://theboc.googlecode.com/svn;;false;<https\://theboc.googlecode.com\:443> Google Code Subversion Repository;;0
+repositories/7027838c502700141d32ccca1a529350=7027838c502700141d32ccca1a529350;https\://fauandroid.googlecode.com/svn;https\://fauandroid.googlecode.com/svn;branches;tags;trunk;true;ef92fe8a-2b4c-f6fd-c198-e330cb657c38;https\://fauandroid.googlecode.com/svn;;false;;;0
