@@ -1,0 +1,300 @@
+package org.theBOC.bocbible;
+
+import org.theBOC.bocbible.R;
+import org.theBOC.bocbible.Adapters.NavDrawerListAdapter;
+import org.theBOC.bocbible.BOCDialogFrag4Activity.BOCDialogFrag4ActivityListener;
+import org.theBOC.bocbible.Models.NavDrawerItem;
+
+import java.util.ArrayList;
+import android.app.Activity;
+import android.app.DialogFragment;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.SearchManager;
+import android.content.Context;
+import android.content.Intent;
+import android.content.res.Configuration;
+import android.content.res.TypedArray;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.GradientDrawable.Orientation;
+import android.os.Bundle;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.view.Gravity;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.Toast;
+
+public class Home extends Activity {
+	private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private CharSequence mTitle;
+    private String[] navMenuTitles;
+    private TypedArray navMenuIcons;
+    private ArrayList<NavDrawerItem> navDrawerItems;
+    private NavDrawerListAdapter adapter;
+    private final String HOMETAG = "HOME_TAG";
+    private final String HIGHLIGHTSTAG = "HIGHLIGHTS_TAG";
+    private final String ABOUTTAG = "ABOUT_TAG";
+    private BOCDialogFrag4Activity dialFrag;
+    private Context context;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.home);   
+        this.context = this;
+        navMenuTitles = getResources().getStringArray(R.array.menu_Items);
+        navMenuIcons = getResources().obtainTypedArray(R.array.menu_icons);        
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        int[] colors = {0, 0xFFCCCCCC, 0}; 
+        mDrawerList.setDivider(new GradientDrawable(Orientation.RIGHT_LEFT, colors));
+        mDrawerList.setDividerHeight(1);
+        navDrawerItems = new ArrayList<NavDrawerItem>();
+        
+        navDrawerItems.add(new NavDrawerItem(navMenuTitles[0], navMenuIcons.getResourceId(0, -1)));
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[1], navMenuIcons.getResourceId(1, -1)));
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1)));
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[3], navMenuIcons.getResourceId(3, -1)));
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[4], navMenuIcons.getResourceId(4, -1)));
+		// Recycle the typed array
+		navMenuIcons.recycle();		
+		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+		
+		// setting the nav drawer list adapter
+		adapter = new NavDrawerListAdapter(getApplicationContext(), navDrawerItems);
+		mDrawerList.setAdapter(adapter);		
+        // set a custom shadow that overlays the main content when the drawer opens
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+        // set up the drawer's list view with items and click listener
+        //mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, navMenuTitles));
+        
+
+        // enable ActionBar app icon to behave as action to toggle nav drawer
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
+        getActionBar().setTitle(R.string.the_bible);
+        // ActionBarDrawerToggle ties together the the proper interactions
+        // between the sliding drawer and the action bar app icon
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this,                  /* host Activity */
+                mDrawerLayout,         /* DrawerLayout object */
+                R.drawable.ic_drawer,  /* nav drawer image to replace 'Up' caret */
+                R.string.drawer_open,  /* "open drawer" description for accessibility */
+                R.string.drawer_close  /* "close drawer" description for accessibility */
+                ) {
+            public void onDrawerClosed(View view) {
+                //getActionBar().setTitle(mTitle);
+                //invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+            public void onDrawerOpened(View drawerView) {
+                //getActionBar().setTitle(mDrawerTitle);
+                //invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+        };
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        if (savedInstanceState == null) {
+            selectItem(0);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.home, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    /* Called whenever we call invalidateOptionsMenu() */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // If the nav drawer is open, hide action items related to the content view
+       // boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
+        menu.findItem(R.id.action_websearch).setVisible(false);
+        
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+         // The action bar home/up action should open or close the drawer.
+         // ActionBarDrawerToggle will take care of this.
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        // Handle action buttons
+        switch(item.getItemId()) {
+        case R.id.action_websearch:
+            // create intent to perform web search for this planet
+            Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
+            intent.putExtra(SearchManager.QUERY, getActionBar().getTitle());
+            // catch event that there's no activity to handle intent
+            if (intent.resolveActivity(getPackageManager()) != null) {
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, R.string.app_not_available, Toast.LENGTH_LONG).show();
+            }
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /* The click listener for ListView in the navigation drawer */
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            selectItem(position);
+        }
+    }
+
+    private void selectItem(int position) {
+        Fragment frag = null;
+        String tag = "";
+        String title = null;
+    	switch(position)
+    	{
+	    	case 0:
+	    		frag = new HomeFragment();
+	    		tag = HOMETAG;
+	    		break;
+	    	case 1:
+	    		frag = new HomeFragment();
+	    		tag = HOMETAG;
+	    		title = getString(R.string.the_bible);
+	    		this.gotoBible(null);
+	    		break;
+	    	case 2:
+	    		frag = new HightlightsFragment();
+	    		tag = HIGHLIGHTSTAG;
+	    		break;
+	    	case 3:
+	    		frag = new About();
+	    		tag = ABOUTTAG;
+	    		break;
+	    	case 4:
+	    		dialFrag = new BOCDialogFrag4Activity();
+	    		dialFrag.setBtnNegativeText(getResources().getString(R.string.cancel));
+				dialFrag.setBtnPositiveText(getResources().getString(R.string.yes));
+				dialFrag.setDialogMessage("Are you sure you want to close BOC Bible?");
+				BOCDialogFrag4ActivityListener listener = new BOCDialogFrag4ActivityListener() {
+					
+					@Override
+					public void onDialogPositiveClick(DialogFragment dialog) {
+						((Activity) context).finish();
+					}
+					
+					@Override
+					public void onDialogNegativeClick(DialogFragment dialog) {
+						// TODO Auto-generated method stub
+						
+					}
+				};
+				dialFrag.setListener(listener);
+	    		FragmentManager fragmentManager = getFragmentManager();
+	    		dialFrag.show(fragmentManager, "CLOSE_APP");
+	    		break;
+			default:
+				frag = new HomeFragment();
+    	}
+    	if(frag != null)
+    	{
+	        FragmentManager fragmentManager = getFragmentManager();
+	        fragmentManager.beginTransaction().replace(R.id.content_frame, frag, tag).commit();  
+	     // update selected item and title, then close the drawer
+	        mDrawerList.setItemChecked(position, true);
+	        if(title == null)
+	        	title = position != 0 ? navMenuTitles[position] : getString(R.string.the_bible);
+	        getActionBar().setTitle(title);
+    	}
+    	mDrawerLayout.closeDrawer(mDrawerList);
+    }
+
+    @Override
+    public void setTitle(CharSequence title) {
+        mTitle = title;
+        getActionBar().setTitle(mTitle);
+    }
+
+
+	public void gotoBible(View view)
+	{
+		Intent bibleIntent = new Intent(Home.this, Bible.class);
+		startActivity(bibleIntent);
+	}
+    /**
+     * When using the ActionBarDrawerToggle, you must call it during
+     * onPostCreate() and onConfigurationChanged()...
+     */
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // Pass any configuration change to the drawer toggles
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+    
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+       if ( keyCode == KeyEvent.KEYCODE_MENU ) {
+    	   if(mDrawerLayout.isDrawerOpen(Gravity.LEFT))
+    		   mDrawerLayout.closeDrawer(Gravity.LEFT);
+    	   else
+    		   mDrawerLayout.openDrawer(Gravity.LEFT);
+           return true;
+       }
+       return super.onKeyDown(keyCode, event);
+    }
+    
+    @Override
+    public void onBackPressed() {
+    	HomeFragment homeFrag = (HomeFragment) getFragmentManager().findFragmentByTag(HOMETAG);
+    	if (homeFrag != null && homeFrag.isVisible()) {
+    		
+    		dialFrag = new BOCDialogFrag4Activity();
+    		dialFrag.setBtnNegativeText(getResources().getString(R.string.cancel));
+			dialFrag.setBtnPositiveText(getResources().getString(R.string.yes));
+			dialFrag.setDialogMessage("Are you sure you want to close BOC Bible?");
+			BOCDialogFrag4ActivityListener listener = new BOCDialogFrag4ActivityListener() {
+				
+				@Override
+				public void onDialogPositiveClick(DialogFragment dialog) {
+					((Activity) context).finish();
+				}
+				
+				@Override
+				public void onDialogNegativeClick(DialogFragment dialog) {
+					// TODO Auto-generated method stub
+					
+				}
+			};
+			dialFrag.setListener(listener);
+    		FragmentManager fragmentManager = getFragmentManager();
+    		dialFrag.show(fragmentManager, "CLOSE_APP");
+    	}
+    	else {
+    		homeFrag = new HomeFragment();
+    		FragmentManager fragmentManager = getFragmentManager();
+    		fragmentManager.beginTransaction().replace(R.id.content_frame, homeFrag, HOMETAG).commit();
+    		mDrawerList.setItemChecked(0, true);
+	        getActionBar().setTitle(getString(R.string.the_bible));
+    	}
+    }
+}
