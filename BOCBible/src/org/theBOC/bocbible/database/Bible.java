@@ -66,6 +66,26 @@ public class Bible extends DbBase {
 		}
 		return bible;
 	}
+	public int GetNumVerses(int bookId, int chapter, String version)
+	{
+		SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+		String [] sqlSelect = {"count(*)"};
+		String sqlTables = "ZBIBLE" + version;
+		String where = "ZBOOKID=" + bookId + " AND ZCHAPTER=" + chapter;
+		qb.setTables(sqlTables);
+		try
+		{
+			Cursor c = qb.query(DB, sqlSelect, where, null, null, null, null);
+			c.moveToFirst();
+			if (c.moveToFirst())
+				return c.getInt(0);
+		}
+		catch(Exception e)
+		{
+			// Error
+		}
+		return 0;
+	}
 	
 	public void HightLightVerse(int id, String highLight, String version)
 	{
