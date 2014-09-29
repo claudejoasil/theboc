@@ -120,10 +120,10 @@ public class BookListAdapter extends BaseExpandableListAdapter {
 		 int gridWidth;
 		 if(parentWidth <= numChapters * COL_WIDTH)
 		 {
-			 colCount = (int)Math.floor(parentWidth / (COL_WIDTH + SPACING));
-			 rowCount = (int)Math.ceil(numChapters / colCount);
-			 gridHeight = Math.round(rowCount * (ROW_HEIGHT + SPACING) + ROW_HEIGHT + SPACING);
-			 gridWidth = Math.round(colCount * (COL_WIDTH + SPACING) + SPACING);
+			 colCount = (int)Math.floor((parentWidth - SPACING) / (COL_WIDTH + SPACING + 0d));
+			 rowCount = (int)Math.ceil(numChapters / (colCount * 1d));
+			 gridHeight = Math.round(rowCount * (ROW_HEIGHT + SPACING + 1));
+			 gridWidth = Math.round(colCount * (COL_WIDTH + SPACING + 1));
 		 }
 		 else
 		 {

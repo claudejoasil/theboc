@@ -9,13 +9,16 @@ import org.theBOC.bocbible.common.MiscHelper;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.ActionBar;
-import android.app.Activity;
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
@@ -23,7 +26,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class Bible extends Activity {
+public class Bible  extends Fragment {
 	public static final String currentValues = "BibleCurrentValues";
 	public static final int lastBookId = 66;
 	public static final int lastOldTestamentBookId = 39;
@@ -47,13 +50,14 @@ public class Bible extends Activity {
 	private static ArrayList<org.theBOC.bocbible.Models.Bible> m_verses;
 	private static int m_textSize;
 	ProgressDialog mProgressDialog;
+	View rootView;
 	
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		rootView = inflater.inflate(R.layout.activity_bible, container, false);
+		setHasOptionsMenu(true);  
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_bible);
-		bibleHelper = BibleHelper.getInstance(this);
-		miscHelper = MiscHelper.getInstance(this);
+		bibleHelper = BibleHelper.getInstance(this.getActivity());
+		miscHelper = MiscHelper.getInstance(this.getActivity());
 		miscHelper.reloadBiblePage = true;
 		this.initControls();
 		lstView.setOnItemClickListener(new OnItemClickListener() 
@@ -84,14 +88,15 @@ public class Bible extends Activity {
 		m_textSize = m_textSize <= 0 ? 
 				bibleHelper.getCurrentTextSize((int)this.getResources().getDimension(R.dimen.bible_Default_text_size)) : 
 				m_textSize;
-		ActionBar actionBar = getActionBar();
+		ActionBar actionBar = this.getActivity().getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setDisplayShowTitleEnabled(false);
-		actionBar.setIcon(R.drawable.ic_bible);		
+		actionBar.setIcon(R.drawable.ic_bible);	
+		return rootView;
 	}
 	
     @Override
-    protected void onResume() {
+	public void onResume() {
     	super.onResume();
     	if(miscHelper.reloadBiblePage)
     	{
@@ -101,36 +106,36 @@ public class Bible extends Activity {
     	}
     }
 	@Override
-	 protected void onStop(){
+	public void onStop(){
         super.onStop();
         bibleHelper.persistCurrentValues();
     }
 	@Override
-	protected void onPause() {
+	public void onPause() {
         super.onPause();
         bibleHelper.persistCurrentValues();
     }
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.bible, menu);
+		inflater.inflate(R.menu.bible, menu);
 		this.menu = menu;
 		if(bibleHelper.getCurrentBookId(0) <= 0)
 			this.setCurrentValues(-1);
 		this.updateActionTitles();
-		return true;
+		super.onCreateOptionsMenu(menu, inflater);
 	}
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
          // Handle action buttons
         switch(item.getItemId()) {
         case R.id.action_bible_book_chapter:
-        	Intent bookIntent = new Intent(Bible.this, Books.class);
+        	Intent bookIntent = new Intent(Bible.this.getActivity(), Books.class);
         	bookIntent.putExtra("ACTIVITY_TITLE", this.currentBookObj.getName() + " " +  bibleHelper.getCurrentChapter(1));
     		startActivity(bookIntent);
             return true;
         case R.id.action_bible_version:
-        	Intent versionIntent = new Intent(Bible.this, Versions.class);
+        	Intent versionIntent = new Intent(Bible.this.getActivity(), Versions.class);
     		startActivity(versionIntent);
             return true; 
         default:
@@ -150,7 +155,7 @@ public class Bible extends Activity {
 	            break;
 	        case R.id.btnPreviousChapter:
 	        	if(bibleDB == null)
-	        		bibleDB = new org.theBOC.bocbible.database.Bible(this);
+	        		bibleDB = new org.theBOC.bocbible.database.Bible(this.getActivity());
 	        	if(bibleHelper.getCurrentChapter(1) > 1)
 	        		bibleHelper.incrementChapter(-1);
 	        	else
@@ -165,7 +170,7 @@ public class Bible extends Activity {
 	            break;
 	        case R.id.btnNextChapter: 
 	        	if(bibleDB == null)
-	        		bibleDB = new org.theBOC.bocbible.database.Bible(this);
+	        		bibleDB = new org.theBOC.bocbible.database.Bible(this.getActivity());
 	        	if(bibleHelper.getCurrentChapter(0) + 1 <= this.currentBookObj.getNumChapters())
 	        		bibleHelper.incrementChapter(1);
 	        	else
@@ -200,11 +205,11 @@ public class Bible extends Activity {
 	private void setCurrentValues(int bookId)
 	{
 		if(versionDB == null)
-			versionDB = new org.theBOC.bocbible.database.Version(this);
+			versionDB = new org.theBOC.bocbible.database.Version(this.getActivity());
 		currentVersionObj = versionDB.getVersion(bibleHelper.getCurrentVersionId(4), null);
 		
 		if(bookDB == null)
-			bookDB = new org.theBOC.bocbible.database.Book(this);
+			bookDB = new org.theBOC.bocbible.database.Book(this.getActivity());
 		if(bookId == -1)
 		{
 			this.currentBookObj = bookDB.getBook(bibleHelper.getCurrentBookId(1), currentVersionObj.getLanguage());
@@ -255,28 +260,28 @@ public class Bible extends Activity {
 	}
 	private void bindBible(int textSizeIncrement)
 	{
-		mProgressDialog = new ProgressDialog(Bible.this);
+		mProgressDialog = new ProgressDialog(Bible.this.getActivity());
 		mProgressDialog.setMessage("please wait...");
 		mProgressDialog.setIndeterminate(true);
 		mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		mProgressDialog.setCancelable(false);
-		final GetBibleVersesTask getBibleVersesTask = new GetBibleVersesTask(Bible.this);
+		final GetBibleVersesTask getBibleVersesTask = new GetBibleVersesTask(Bible.this.getActivity());
 		getBibleVersesTask.execute(textSizeIncrement);
 	}
 	private void initDB()
 	{
-		bibleDB = new org.theBOC.bocbible.database.Bible(this);
-		bookDB = new org.theBOC.bocbible.database.Book(this);
-		versionDB = new org.theBOC.bocbible.database.Version(this);
+		bibleDB = new org.theBOC.bocbible.database.Bible(this.getActivity());
+		bookDB = new org.theBOC.bocbible.database.Book(this.getActivity());
+		versionDB = new org.theBOC.bocbible.database.Version(this.getActivity());
 	}
 
 	private void initControls()
 	{
-		lstView = (ListView) findViewById(R.id.lst_bible_verses);
-		btnMagnifyMinus = (ImageButton) findViewById(R.id.btnMagnifyMinus);
-		btnMagnifyPlus = (ImageButton) findViewById(R.id.btnMagnifyPlus);
-		btnNextChapter = (ImageButton) findViewById(R.id.btnNextChapter);
-		btnPreviousChapter = (ImageButton) findViewById(R.id.btnPreviousChapter);
+		lstView = (ListView) rootView.findViewById(R.id.lst_bible_verses);
+		btnMagnifyMinus = (ImageButton) rootView.findViewById(R.id.btnMagnifyMinus);
+		btnMagnifyPlus = (ImageButton) rootView.findViewById(R.id.btnMagnifyPlus);
+		btnNextChapter = (ImageButton) rootView.findViewById(R.id.btnNextChapter);
+		btnPreviousChapter = (ImageButton) rootView.findViewById(R.id.btnPreviousChapter);
 	}
 	/*private void autoScroll()
 	{
