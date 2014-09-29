@@ -1,19 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle" >
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- view background color -->
-    <solid android:color="@color/counter_text_bg" >
-    </solid>
+     <!-- Drop Shadow Stack -->
+     <item>
+        <shape>
+            <padding android:top="1dp" android:right="1dp" android:bottom="1dp" android:left="1dp" />
+            <solid android:color="#00CCCCCC" />
+        </shape>
+    </item>
+     <item>
+        <shape>
+            <padding android:top="1dp" android:right="1dp" android:bottom="1dp" android:left="1dp" />
+            <solid android:color="#10CCCCCC" />
+        </shape>
+    </item>
+     <item>
+        <shape>
+            <padding android:top="1dp" android:right="1dp" android:bottom="1dp" android:left="1dp" />
+            <solid android:color="#20CCCCCC" />
+        </shape>
+    </item>
+     <item>
+        <shape>
+            <padding android:top="1dp" android:right="1dp" android:bottom="1dp" android:left="1dp" />
+            <solid android:color="#30CCCCCC" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <padding android:top="1dp" android:right="1dp" android:bottom="1dp" android:left="1dp" />
+            <solid android:color="#50CCCCCC" />
+        </shape>
+    </item>
 
-    <!-- If you want to add some padding -->
-    <padding
-        android:right="3dp"
-        android:left="3dp" >
-    </padding>
-
-    <!-- Here is the corner radius -->
-    <corners android:radius="5dp" >
-    </corners>
-
-</shape>
+    <!-- Background -->
+    <item>
+	<shape>
+            <solid android:color="#FFFFFF" />
+	    <corners android:radius="5dp" />
+	</shape>
+    </item>
+</layer-list>
