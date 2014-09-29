@@ -43,8 +43,10 @@ public class Home extends Activity {
     private final String HOMETAG = "HOME_TAG";
     private final String HIGHLIGHTSTAG = "HIGHLIGHTS_TAG";
     private final String ABOUTTAG = "ABOUT_TAG";
+    private final String BIBLETAG = "BIBLE_TAG";
     private BOCDialogFrag4Activity dialFrag;
     private Context context;
+    private Fragment frag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,7 +161,7 @@ public class Home extends Activity {
     }
 
     private void selectItem(int position) {
-        Fragment frag = null;
+        frag = null;
         String tag = "";
         String title = null;
     	switch(position)
@@ -169,10 +171,12 @@ public class Home extends Activity {
 	    		tag = HOMETAG;
 	    		break;
 	    	case 1:
-	    		frag = new HomeFragment();
-	    		tag = HOMETAG;
-	    		title = getString(R.string.the_bible);
-	    		this.gotoBible(null);
+	    		//frag = new HomeFragment();
+	    		//tag = HOMETAG;
+	    		frag = new Bible();
+	    		tag = BIBLETAG;
+	    		title = "";
+	    		//this.gotoBible(null);
 	    		break;
 	    	case 2:
 	    		frag = new HightlightsFragment();
@@ -229,13 +233,17 @@ public class Home extends Activity {
 
 	public void gotoBible(View view)
 	{
-		Intent bibleIntent = new Intent(Home.this, Bible.class);
-		startActivity(bibleIntent);
+		frag = new Bible();
+		String tag = BIBLETAG;
+		if(frag != null)
+    	{
+	        FragmentManager fragmentManager = getFragmentManager();
+	        fragmentManager.beginTransaction().replace(R.id.content_frame, frag, tag).commit();  
+	     // update selected item and title, then close the drawer
+	        mDrawerList.setItemChecked(1, true);
+	        getActionBar().setTitle("");
+    	}
 	}
-    /**
-     * When using the ActionBarDrawerToggle, you must call it during
-     * onPostCreate() and onConfigurationChanged()...
-     */
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -296,5 +304,17 @@ public class Home extends Activity {
     		mDrawerList.setItemChecked(0, true);
 	        getActionBar().setTitle(getString(R.string.the_bible));
     	}
+    }
+    
+    public void bottomButtonClick(View view){
+		try
+		{
+			 ((Bible)frag).bottomButtonClick(view);
+		}
+		catch(Exception e)
+		{
+			//ONLY FOR BIBLE FRAGMENT
+		}
+       
     }
 }

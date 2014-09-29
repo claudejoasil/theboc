@@ -12,7 +12,6 @@ import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -105,8 +104,7 @@ public class HighlightListAdapter extends BaseAdapter{
 				bibleHelper.setCurrentVersionName(mCurrentBibleObj.getVersion());
 				bibleHelper.setCurrentVersionId(mCurrentBibleObj.getVersionId());
 				bibleHelper.setCurrentTestament(mCurrentBibleObj.getBookId() <= 39 ? 1 : 2);
-				Intent versionIntent = new Intent(context, org.theBOC.bocbible.Bible.class);
-	    		context.startActivity(versionIntent); 
+				((org.theBOC.bocbible.Home) context).gotoBible(null);
 			}
 		});
         txtHighLightVerse.setText(verses.get(position).getVerseText()); 
