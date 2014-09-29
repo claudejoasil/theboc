@@ -44,8 +44,8 @@ public class verseGridAdapter extends BaseAdapter {
 		LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);        
         int chapter = verses.get(position);
 		if(convertView == null)
-			convertView = mInflater.inflate(R.layout.chapter_item, parent, false);
-		TextView txtText = (TextView) convertView.findViewById(R.id.chapter_text); 
+			convertView = mInflater.inflate(R.layout.verse_grid_item, parent, false);
+		TextView txtText = (TextView) convertView.findViewById(R.id.verse_int_text); 
         txtText.setText(Integer.toString(chapter));
         return convertView;
 	}

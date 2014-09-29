@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -32,6 +33,14 @@ public class Bible extends Activity {
 	private MiscHelper miscHelper;
 	private Menu menu;
 	private ListView lstView;
+	private ImageButton btnMagnifyMinus;
+	private ImageButton btnMagnifyPlus;
+	private ImageButton btnNextChapter;
+	private ImageButton btnPreviousChapter;
+	/*private int autoScrollSpeed = 0;
+	private CountDownTimer autoScrollCountDown;
+	private final int autoScrollSpeedIncrement = 20;
+	private final long totalScrollTime = Long.MAX_VALUE; */
 	private static org.theBOC.bocbible.database.Bible bibleDB;
 	private static org.theBOC.bocbible.database.Book bookDB;
 	private static org.theBOC.bocbible.database.Version versionDB;
@@ -46,7 +55,7 @@ public class Bible extends Activity {
 		bibleHelper = BibleHelper.getInstance(this);
 		miscHelper = MiscHelper.getInstance(this);
 		miscHelper.reloadBiblePage = true;
-		lstView = (ListView) findViewById(R.id.lst_bible_verses);
+		this.initControls();
 		lstView.setOnItemClickListener(new OnItemClickListener() 
 		{
 	          public void onItemClick(AdapterView<?> parent, View view, int position, long id) 
@@ -80,6 +89,7 @@ public class Bible extends Activity {
 		actionBar.setDisplayShowTitleEnabled(false);
 		actionBar.setIcon(R.drawable.ic_bible);		
 	}
+	
     @Override
     protected void onResume() {
     	super.onResume();
@@ -122,42 +132,14 @@ public class Bible extends Activity {
         case R.id.action_bible_version:
         	Intent versionIntent = new Intent(Bible.this, Versions.class);
     		startActivity(versionIntent);
-            return true;   
-        /*case R.id.action_previous:
-        	if(bibleDB == null)
-        		bibleDB = new org.theBOC.bocbible.database.Bible(this);
-        	if(bibleHelper.getCurrentChapter(1) > 1)
-        		bibleHelper.incrementChapter(-1);
-        	else
-        	{
-        		bibleHelper.incrementChapter(-2); //SET Chapter to -1 at this point chapter is 1
-        		if(this.currentBookObj.getBookId() == lastOldTestamentBookId + 1)
-        			bibleHelper.setCurrentTestament(1);
-        		this.setCurrentValues(this.currentBookObj.getBookId() - 1);
-        	}
-    		this.bindBible(0);
-    		this.updateActionTitles();
-    		return true;
-        case R.id.action_next:
-        	if(bibleDB == null)
-        		bibleDB = new org.theBOC.bocbible.database.Bible(this);
-        	if(bibleHelper.getCurrentChapter(0) + 1 <= this.currentBookObj.getNumChapters())
-        		bibleHelper.incrementChapter(1);
-        	else
-        	{
-        		if(this.currentBookObj.getBookId() == lastOldTestamentBookId)
-        			bibleHelper.setCurrentTestament(2);
-        		this.setCurrentValues(this.currentBookObj.getBookId() + 1);  
-        	}
-    		this.bindBible(0);
-    		this.updateActionTitles();
-    		return true; */
+            return true; 
         default:
             return super.onOptionsItemSelected(item);
         }
     }
 	public void bottomButtonClick(View view) 
 	{
+		activeButtons(false);
 		switch(view.getId())
 		{
 			case R.id.btnMagnifyMinus:
@@ -195,6 +177,24 @@ public class Bible extends Activity {
 	    		this.bindBible(0);
 	    		this.updateActionTitles();
 	            break;
+	        /*case R.id.btnScrollPlus:
+	        	this.autoScrollSpeed += this.autoScrollSpeedIncrement;
+	        	this.autoScroll();
+	        	break;
+	        case R.id.btnScrollMinus:
+	        	this.autoScrollSpeed = this.autoScrollSpeed > this.autoScrollSpeedIncrement ? 
+	        			this.autoScrollSpeed - this.autoScrollSpeedIncrement : 0;
+	        	if(this.autoScrollSpeed > this.autoScrollSpeedIncrement)
+	        	{
+	        		this.autoScrollSpeed -= this.autoScrollSpeedIncrement;
+	        		this.autoScroll();
+	        	}
+	        	else
+	        	{
+	        		autoScrollCountDown.cancel();
+	        	}
+	        	
+	        	break;*/
 		}
 	}
 	private void setCurrentValues(int bookId)
@@ -269,7 +269,37 @@ public class Bible extends Activity {
 		bookDB = new org.theBOC.bocbible.database.Book(this);
 		versionDB = new org.theBOC.bocbible.database.Version(this);
 	}
-	
+
+	private void initControls()
+	{
+		lstView = (ListView) findViewById(R.id.lst_bible_verses);
+		btnMagnifyMinus = (ImageButton) findViewById(R.id.btnMagnifyMinus);
+		btnMagnifyPlus = (ImageButton) findViewById(R.id.btnMagnifyPlus);
+		btnNextChapter = (ImageButton) findViewById(R.id.btnNextChapter);
+		btnPreviousChapter = (ImageButton) findViewById(R.id.btnPreviousChapter);
+	}
+	/*private void autoScroll()
+	{
+		
+		autoScrollCountDown = new CountDownTimer(totalScrollTime, autoScrollSpeed ) {
+            public void onTick(long millisUntilFinished) {
+            	lstView.scrollBy(0, autoScrollSpeed);
+            	if(lstView.getLastVisiblePosition() == lstView.getCount())
+            		autoScrollCountDown.cancel();
+            }
+
+	        public void onFinish() {
+	            //you can add code for restarting timer here
+	        }
+	    };
+	    
+		lstView.post(new Runnable() {
+            @Override
+            public void run() {
+            	autoScrollCountDown.start();
+            }
+        });
+	}*/
 	private class GetBibleVersesTask extends AsyncTask<Integer, Integer, VerseListAdapter> {
 	    private Context context;
 	    public GetBibleVersesTask(Context context) {
@@ -307,7 +337,15 @@ public class Bible extends Activity {
 	        lstView.setDivider(null);		
 			lstView.setAdapter(adt);
 			lstView.setSelection(bibleHelper.getCurrentVerse(1) - 1);
+			activeButtons(true);
 			//lstView.smoothScrollToPosition(bibleHelper.getCurrentVerse(1) - 1);
 	    }
+	}
+	private void activeButtons(boolean activate)
+	{
+		btnMagnifyMinus.setActivated(activate);
+		btnMagnifyPlus.setActivated(activate);
+		btnNextChapter.setActivated(activate);
+		btnPreviousChapter.setActivated(activate);
 	}
 }

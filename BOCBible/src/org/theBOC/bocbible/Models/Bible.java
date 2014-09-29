@@ -52,7 +52,7 @@ public class Bible {
 	}
 	public void setVerseText(String verseText)
 	{
-		this.versetext = verseText;
+		this.versetext = this.cleanVerseText(verseText);
 	}
 	public int getChapter()
 	{
@@ -85,5 +85,13 @@ public class Bible {
 	public void setHighLights(String highLights)
 	{
 		this.highLights = highLights;
+	}
+	private String cleanVerseText(String txt)
+	{
+		if(txt != null)
+		{
+			txt = txt.replace("\\r", "");
+		}
+		return txt;
 	}
 }
