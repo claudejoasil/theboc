@@ -26,7 +26,9 @@ public class BibleHelper {
 	private int currentChapter;
 	private int currentVerse;
 	private int currentVersionId;
+	private int currentVersionId2;
 	private String currentVersionName;
+	private String currentVersionName2;
 	private String currentLanguage;
 	private int currentTestament;
 	private int currentTextSize;
@@ -124,9 +126,18 @@ public class BibleHelper {
 			this.currentVersionId = sharedpreferences.getInt(VersionId, defaultVal);
 		return this.currentVersionId;
 	}
+
 	public void setCurrentVersionId(int value)
 	{
 		this.currentVersionId = value;
+	}
+	public int getCurrentVersionId2()
+	{
+		return this.currentVersionId2;
+	}
+	public void setCurrentVersionId2(int value)
+	{
+		this.currentVersionId2 = value;
 	}
 	public String getCurrentVersionName(String defaultVal)
 	{
@@ -138,7 +149,14 @@ public class BibleHelper {
 	{
 		this.currentVersionName = value;
 	}
-	
+	public String getCurrentVersionName2()
+	{
+		return this.currentVersionName2;
+	}
+	public void setCurrentVersionName2(String value)
+	{
+		this.currentVersionName2 = value;
+	}
 	public String getCurrentLanguage(String defaultVal)
 	{
 		if(this.currentLanguage == "")

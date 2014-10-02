@@ -20,8 +20,9 @@ import android.database.sqlite.SQLiteQueryBuilder;
 			String [] sqlSelect = {"ZBOOKID", "ZNUMCHAPTERS", "ZNAME", "ZSHORTNAME"}; 
 			String sqlTables = "ZBIBLEBOOKS" + language;
 			String where = "ZTESTAMENT=" + testament;
+			String orderBy = "ZBOOKID";
 			qb.setTables(sqlTables);
-			Cursor c = qb.query(DB, sqlSelect, where, null, null, null, null);
+			Cursor c = qb.query(DB, sqlSelect, where, null, null, null, orderBy);
 			c.moveToFirst();
 			ArrayList<org.theBOC.bocbible.Models.Book> books = new ArrayList<org.theBOC.bocbible.Models.Book>();
 			if (c.moveToFirst()) {

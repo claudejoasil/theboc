@@ -41,6 +41,38 @@ public class Bible extends DbBase {
 		return verses;
 	}
 	
+	public ArrayList<org.theBOC.bocbible.Models.Bible> getDualVersionVerses(int bookId, int chapter, String[] version) 
+	{
+
+		String query = "SELECT B1.Z_PK, B1.ZVERSE, B1.ZVERSETEXT, B2.ZVERSETEXT, B1.ZHIGHLIGHT, B2.ZHIGHLIGHT " +
+				" FROM ZBIBLE" + version[0] + " B1 " +
+				" INNER JOIN ZBIBLE" + version[1] + " B2 ON B1.ZBOOKID=B2.ZBOOKID AND B1.ZCHAPTER=B2.ZCHAPTER AND B1.ZVERSE = B2.ZVERSE " +
+				" WHERE B1.ZBOOKID=" + bookId + " AND B1.ZCHAPTER=" + chapter;
+		ArrayList<org.theBOC.bocbible.Models.Bible> verses = new ArrayList<org.theBOC.bocbible.Models.Bible>();
+		try
+		{
+			Cursor c = DB.rawQuery(query, null);
+			c.moveToFirst();
+			
+			if (c.moveToFirst()) {
+	            do {
+	            	org.theBOC.bocbible.Models.Bible bible = new org.theBOC.bocbible.Models.Bible();
+	            	bible.setPk(c.getInt(0));
+	                bible.setVerse(Integer.parseInt(c.getString(1)));
+	                bible.setVerseText(c.getString(2));
+	                bible.setVerseText2(c.getString(3));
+	                bible.setHighLights(c.getString(4));
+	                bible.setHighLights2(c.getString(5));
+	                verses.add(bible);
+	            } while (c.moveToNext());
+	        }
+		}
+		catch(Exception e)
+		{
+			// THIS Version doesn't exist yet
+		}
+		return verses;
+	}
 	public org.theBOC.bocbible.Models.Bible getWeeklyVerse(String version, int weekNumber) 
 	{
 		String  sqlSelect = "SELECT A.ZBOOKID, A.ZBOOK, A.ZCHAPTER, A.ZVERSE, A.ZVERSETEXT FROM ZBIBLE" + version + " A " +
@@ -138,8 +170,7 @@ public class Bible extends DbBase {
 	                bible.setBook(c.getString(4));
 	                bible.setChapter(c.getInt(5));
 	                bible.setBookId(c.getInt(6));
-	                bible.setVersion(version.getShortName());
-	                bible.setVersionId(version.getId());
+	                bible.setVersion(version);
 	                verses.add(bible);
 	            } while (c.moveToNext());
 	        }
