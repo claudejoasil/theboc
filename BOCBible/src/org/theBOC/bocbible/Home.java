@@ -305,16 +305,4 @@ public class Home extends Activity {
 	        getActionBar().setTitle(getString(R.string.the_bible));
     	}
     }
-    
-    public void bottomButtonClick(View view){
-		try
-		{
-			 ((Bible)frag).bottomButtonClick(view);
-		}
-		catch(Exception e)
-		{
-			//ONLY FOR BIBLE FRAGMENT
-		}
-       
-    }
 }

@@ -76,7 +76,7 @@ public class HighlightListAdapter extends BaseAdapter{
 					@Override
 					public void onDialogPositiveClick(DialogFragment dialog) {
 						org.theBOC.bocbible.database.Bible bibleDB = new org.theBOC.bocbible.database.Bible(context);
-					  	bibleDB.UnHightLightVerse(verses.get(position).getPk(), verses.get(position).getVersion());
+					  	bibleDB.UnHightLightVerse(verses.get(position).getPk(), verses.get(position).getVersion().getShortName());
 					  	verses.remove(position);
 					  	notifyDataSetChanged();
 					}
@@ -101,8 +101,8 @@ public class HighlightListAdapter extends BaseAdapter{
 				bibleHelper.setCurrentBookId(mCurrentBibleObj.getBookId());
 				bibleHelper.setCurrentChapter(mCurrentBibleObj.getChapter());
 				bibleHelper.setCurrentVerse(mCurrentBibleObj.getVerse());
-				bibleHelper.setCurrentVersionName(mCurrentBibleObj.getVersion());
-				bibleHelper.setCurrentVersionId(mCurrentBibleObj.getVersionId());
+				bibleHelper.setCurrentVersionName(mCurrentBibleObj.getVersion().getShortName());
+				bibleHelper.setCurrentVersionId(mCurrentBibleObj.getVersion().getId());
 				bibleHelper.setCurrentTestament(mCurrentBibleObj.getBookId() <= 39 ? 1 : 2);
 				((org.theBOC.bocbible.Home) context).gotoBible(null);
 			}

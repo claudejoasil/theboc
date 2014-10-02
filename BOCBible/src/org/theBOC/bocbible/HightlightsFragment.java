@@ -35,7 +35,7 @@ public class HightlightsFragment extends Fragment {
 		Spinner spinVersions = (Spinner) rootView.findViewById(R.id.spin_versions);
 		org.theBOC.bocbible.database.Version versionDB = new org.theBOC.bocbible.database.Version(this.getActivity());
 		final ArrayList<org.theBOC.bocbible.Models.Version> versions = versionDB.getVersions(null, false, true);
-		VersionListAdapter adt = new VersionListAdapter(this.getActivity(), versions);
+		VersionListAdapter adt = new VersionListAdapter(this.getActivity(), versions, true);
 		spinVersions.setAdapter(adt);
 		spinVersions.setOnItemSelectedListener(new OnItemSelectedListener() {
 			@Override

@@ -18,7 +18,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
@@ -54,7 +56,6 @@ public class Bible  extends Fragment {
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		rootView = inflater.inflate(R.layout.activity_bible, container, false);
-		setHasOptionsMenu(true);  
 		super.onCreate(savedInstanceState);
 		bibleHelper = BibleHelper.getInstance(this.getActivity());
 		miscHelper = MiscHelper.getInstance(this.getActivity());
@@ -95,6 +96,12 @@ public class Bible  extends Fragment {
 		return rootView;
 	}
 	
+	
+	@Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        setHasOptionsMenu(true);  
+	 }
     @Override
 	public void onResume() {
     	super.onResume();
@@ -117,7 +124,6 @@ public class Bible  extends Fragment {
     }
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		// Inflate the menu; this adds items to the action bar if it is present.
 		inflater.inflate(R.menu.bible, menu);
 		this.menu = menu;
 		if(bibleHelper.getCurrentBookId(0) <= 0)
@@ -265,6 +271,7 @@ public class Bible  extends Fragment {
 		mProgressDialog.setIndeterminate(true);
 		mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		mProgressDialog.setCancelable(false);
+		mProgressDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
 		final GetBibleVersesTask getBibleVersesTask = new GetBibleVersesTask(Bible.this.getActivity());
 		getBibleVersesTask.execute(textSizeIncrement);
 	}
@@ -279,9 +286,21 @@ public class Bible  extends Fragment {
 	{
 		lstView = (ListView) rootView.findViewById(R.id.lst_bible_verses);
 		btnMagnifyMinus = (ImageButton) rootView.findViewById(R.id.btnMagnifyMinus);
+		btnMagnifyMinus.setOnClickListener(new bottomButtonClickListener());
 		btnMagnifyPlus = (ImageButton) rootView.findViewById(R.id.btnMagnifyPlus);
+		btnMagnifyPlus.setOnClickListener(new bottomButtonClickListener());
 		btnNextChapter = (ImageButton) rootView.findViewById(R.id.btnNextChapter);
+		btnNextChapter.setOnClickListener(new bottomButtonClickListener());
 		btnPreviousChapter = (ImageButton) rootView.findViewById(R.id.btnPreviousChapter);
+		btnPreviousChapter.setOnClickListener(new bottomButtonClickListener());
+	}
+	
+	public class bottomButtonClickListener implements OnClickListener
+	{
+		@Override
+		public void onClick(View v) {
+			bottomButtonClick(v);	
+		}
 	}
 	/*private void autoScroll()
 	{
@@ -313,11 +332,24 @@ public class Bible  extends Fragment {
 
 	    @Override
 	    protected VerseListAdapter doInBackground(Integer... textSize) {
-	        
+	        String[] dualVersions = new String[2];
+	        //bibleHelper.setCurrentVersionId2(4);
+	        //bibleHelper.setCurrentVersionName2("KJV");
+	        dualVersions[0] = currentVersionObj.getShortName();
 	    	if(textSize[0] == 0)
-				m_verses = bibleDB.getVerses(bibleHelper.getCurrentBookId(1), bibleHelper.getCurrentChapter(1), currentVersionObj.getShortName());
+	    	{
+				if(bibleHelper.getCurrentVersionId2() > 0)
+				{
+					dualVersions[1] = bibleHelper.getCurrentVersionName2();
+					m_verses = bibleDB.getDualVersionVerses(bibleHelper.getCurrentBookId(1), bibleHelper.getCurrentChapter(1), dualVersions);
+	    		}
+				else
+				{
+					m_verses = bibleDB.getVerses(bibleHelper.getCurrentBookId(1), bibleHelper.getCurrentChapter(1), currentVersionObj.getShortName());
+				}
+	    	}
 	    	m_textSize += textSize[0];
-	    	VerseListAdapter adt = new VerseListAdapter(this.context, m_verses, (float)m_textSize, currentVersionObj.getShortName());
+	    	VerseListAdapter adt = new VerseListAdapter(this.context, m_verses, (float)m_textSize, dualVersions);
 	    	return adt;
 	    }
 	    

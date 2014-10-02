@@ -117,21 +117,9 @@ public class BookListAdapter extends BaseExpandableListAdapter {
 		 int colCount;
 		 int rowCount;
 		 int gridHeight;
-		 int gridWidth;
-		 if(parentWidth <= numChapters * COL_WIDTH)
-		 {
-			 colCount = (int)Math.floor((parentWidth - SPACING) / (COL_WIDTH + SPACING + 0d));
-			 rowCount = (int)Math.ceil(numChapters / (colCount * 1d));
-			 gridHeight = Math.round(rowCount * (ROW_HEIGHT + SPACING + 1));
-			 gridWidth = Math.round(colCount * (COL_WIDTH + SPACING + 1));
-		 }
-		 else
-		 {
-			 colCount = numChapters;
-			 rowCount = 1;
-			 gridHeight = ROW_HEIGHT + SPACING;
-			 gridWidth = Math.round(colCount * (COL_WIDTH + SPACING) + SPACING);
-		 }
+		 colCount = (int)Math.floor((parentWidth - 2 * SPACING) / (COL_WIDTH + SPACING + 0d));
+		 rowCount = (int)Math.ceil(numChapters / (colCount * 1d));
+		 gridHeight = Math.round(rowCount * (ROW_HEIGHT + SPACING) + SPACING);
 		 chapterGridView.setOnItemClickListener(new OnItemClickListener() 
 		 {
 	          public void onItemClick(AdapterView<?> parent, View view, int position, long id) 
@@ -139,8 +127,7 @@ public class BookListAdapter extends BaseExpandableListAdapter {
 	        	 showPopup(view, book, position);
 	          } 
 		 });
-		 chapterGridView.getLayoutParams().height = gridHeight; 
-		 chapterGridView.getLayoutParams().width = gridWidth;  
+		 chapterGridView.getLayoutParams().height = gridHeight;  
         return convertView;
 	}
 

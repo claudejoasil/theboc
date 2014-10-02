@@ -27,14 +27,16 @@ public class VerseListAdapter extends BaseAdapter {
 	
 	private Context context;
 	private ArrayList<Bible> verses;
-	private static String version;
+	private static String[] versions;
 	private float textSize;
+	private boolean singleVersion;
 	private static final int HIGHTLIGHT = R.id.highLight_menu_item;
-	public VerseListAdapter(Context context, ArrayList<Bible> verses, float textSize, String theVersion){
+	public VerseListAdapter(Context context, ArrayList<Bible> verses, float textSize, String[] theVersions){
 		this.context = context;
 		this.verses = verses;
 		this.textSize = textSize;
-		version = theVersion;
+		versions = theVersions;
+		singleVersion = versions[1] == null;
 	}
 
 	@Override
@@ -54,6 +56,14 @@ public class VerseListAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
+		if(this.singleVersion)
+			return this.getSingleVersionView(position, convertView, parent);
+		else
+			return this.getDualVersionView(position, convertView, parent);
+	}
+	
+	private View getSingleVersionView(int position, View convertView, ViewGroup parent)
+	{
 		if (convertView == null) {
             LayoutInflater mInflater = (LayoutInflater)
                     context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
@@ -66,10 +76,7 @@ public class VerseListAdapter extends BaseAdapter {
         						Integer.toString(bible.getVerse()) + 
 						   "</font> " + 
     						bible.getVerseText();
-        txtVerseText.setText(Html.fromHtml(VerseText)); 
-        txtVerseText.setTag(position);
-        txtVerseText.setTextSize(TypedValue.COMPLEX_UNIT_PX, this.textSize);
-        //txtVerse.setText();
+        String highLights = bible.getHighLights();
         if(position == 0)
         {
         	convertView.setPadding((int)context.getResources().getDimension(R.dimen.activity_horizontal_margin), 
@@ -77,14 +84,62 @@ public class VerseListAdapter extends BaseAdapter {
         						  (int)context.getResources().getDimension(R.dimen.activity_horizontal_margin), 
         						  0);
         }
-        String highLights = bible.getHighLights();
+        txtVerseText.setText(Html.fromHtml(VerseText)); 
+        txtVerseText.setTag(position);
+        txtVerseText.setTextSize(TypedValue.COMPLEX_UNIT_PX, this.textSize);
+        //txtVerse.setText();
+        
         if(highLights != null && !highLights.trim().equals(""))
         	this.highLightText(txtVerseText, highLights);
-        this.handleSelectedText(txtVerseText);
+        this.handleSelectedText(txtVerseText, 0);
         return convertView;
 	}
 	
-	private void handleSelectedText(final TextView mTextView)
+	private View getDualVersionView(int position, View convertView, ViewGroup parent)
+	{
+		if (convertView == null) {
+            LayoutInflater mInflater = (LayoutInflater)
+                    context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
+            convertView = mInflater.inflate(R.layout.dual_version_verse_item, parent, false);
+        }  
+		Bible bible = verses.get(position);
+        //TextView txtVerse = (TextView) convertView.findViewById(R.id.verse_number);
+        TextView txtVerseText1 = (TextView) convertView.findViewById(R.id.verse_text_1); 
+        TextView txtVerseText2 = (TextView) convertView.findViewById(R.id.verse_text_2); 
+        String VerseText = "<font color='#813f15'>" + 
+        						Integer.toString(bible.getVerse()) + 
+						   "</font> " + 
+    						bible.getVerseText();
+        String highLights = bible.getHighLights();
+        
+        String VerseText2 = "<font color='#813f15'>" + 
+				Integer.toString(bible.getVerse()) + 
+		   "</font> " + 
+			bible.getVerseText2();
+        String highLights2 = bible.getHighLights2();
+        if(position == 0)
+        {
+        	convertView.setPadding((int)context.getResources().getDimension(R.dimen.activity_horizontal_margin), 
+        						  (int)context.getResources().getDimension(R.dimen.activity_vertical_margin), 
+        						  (int)context.getResources().getDimension(R.dimen.activity_horizontal_margin), 
+        						  0);
+        }
+        txtVerseText1.setText(Html.fromHtml(VerseText)); 
+        txtVerseText1.setTag(position);
+        txtVerseText1.setTextSize(TypedValue.COMPLEX_UNIT_PX, this.textSize);
+        if(highLights != null && !highLights.trim().equals(""))
+        	this.highLightText(txtVerseText1, highLights);
+        this.handleSelectedText(txtVerseText1, 0);
+        
+        txtVerseText2.setText(Html.fromHtml(VerseText2)); 
+        txtVerseText2.setTag(position);
+        txtVerseText2.setTextSize(TypedValue.COMPLEX_UNIT_PX, this.textSize);
+        if(highLights2 != null && !highLights2.trim().equals(""))
+        	this.highLightText(txtVerseText2, highLights2);
+        this.handleSelectedText(txtVerseText2, 1);
+        return convertView;
+	}
+	private void handleSelectedText(final TextView mTextView, final int versionOffset)
 	{
 		mTextView.setCustomSelectionActionModeCallback(new Callback() {
 
@@ -129,7 +184,7 @@ public class VerseListAdapter extends BaseAdapter {
 	                    	}
 	                    	verses.get(position).setHighLights(newHighLights);
 	                    	org.theBOC.bocbible.database.Bible bibleDB = new org.theBOC.bocbible.database.Bible(context);
-	                    	bibleDB.HightLightVerse(id, hightLights, version);
+	                    	bibleDB.HightLightVerse(id, hightLights, versions[versionOffset]);
 	                    }
 	                    catch(Exception e)
 	                    {

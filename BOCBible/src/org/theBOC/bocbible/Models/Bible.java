@@ -6,10 +6,12 @@ public class Bible {
 	private int bookId;
 	private int chapter;
 	private String versetext;
+	private String versetext2;
 	private int verse;
-	private String version; //TODO use a version object here instead. so versionId will not be needed
-	private int versionId;
+	private Version version;
+	private Version version2;
 	private String highLights;
+	private String highLights2;
 	public Bible()
 	{
 	
@@ -54,6 +56,14 @@ public class Bible {
 	{
 		this.versetext = this.cleanVerseText(verseText);
 	}
+	public String getVerseText2()
+	{
+		return versetext2;
+	}
+	public void setVerseText2(String verseText2)
+	{
+		this.versetext2 = this.cleanVerseText(verseText2);
+	}
 	public int getChapter()
 	{
 		return chapter;
@@ -62,21 +72,21 @@ public class Bible {
 	{
 		this.chapter = chapter;
 	}
-	public String getVersion()
+	public Version getVersion()
 	{
 		return version;
 	}
-	public void setVersion(String version)
+	public void setVersion(Version version)
 	{
 		this.version = version;
 	}
-	public int getVersionId()
+	public Version getVersion2()
 	{
-		return versionId;
+		return version2;
 	}
-	public void setVersionId(int versionId)
+	public void setVersion2(Version version2)
 	{
-		this.versionId = versionId;
+		this.version2 = version2;
 	}
 	public String getHighLights()
 	{
@@ -86,11 +96,23 @@ public class Bible {
 	{
 		this.highLights = highLights;
 	}
+	public String getHighLights2()
+	{
+		return highLights2;
+	}
+	public void setHighLights2(String highLights2)
+	{
+		this.highLights2 = highLights2;
+	}
 	private String cleanVerseText(String txt)
 	{
 		if(txt != null)
 		{
 			txt = txt.replace("\\r", "");
+		}
+		else
+		{
+			txt = "";
 		}
 		return txt;
 	}

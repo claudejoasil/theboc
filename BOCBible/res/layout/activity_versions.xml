@@ -3,7 +3,46 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="org.theBOC.bocbible.Versions" >
+	<!-- <LinearLayout
+        style="?android:attr/buttonBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/list_selector"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:showDividers="none" >
+        <ImageButton
+            android:id="@+id/btnMagnifyMinus"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_magnifier_minus"
+            android:gravity="center_vertical|center_horizontal"
+            android:contentDescription="@null"
+            android:onClick="bottomButtonClick" />
+        
+        <ImageButton
+            android:id="@+id/btnPreviousChapter"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_previous_gray"
+            android:gravity="center_vertical|center_horizontal"
+            android:contentDescription="@null"
+            android:onClick="bottomButtonClick" />
 
+        <ImageButton
+            android:id="@+id/btnNextChapter"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_next_gray"
+            android:gravity="center_vertical|center_horizontal"
+            android:contentDescription="@null"
+            android:onClick="bottomButtonClick" />
+        
+	</LinearLayout> -->
      <ListView android:id="@+id/lst_bible_versions"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

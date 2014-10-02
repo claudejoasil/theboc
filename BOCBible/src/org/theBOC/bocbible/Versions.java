@@ -113,7 +113,7 @@ public class Versions extends FragmentActivity {
 	        	  }
 	          }
 		});
-		VersionListAdapter adt = new VersionListAdapter(this, versions);
+		VersionListAdapter adt = new VersionListAdapter(this, versions, true);
 		lstView.setAdapter(adt);
 		mProgressDialog = new ProgressDialog(Versions.this);
 		mProgressDialog.setMessage("Installing please wait...");

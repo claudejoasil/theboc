@@ -16,10 +16,12 @@ import android.widget.TextView;
 public class VersionListAdapter extends BaseAdapter {
 	private Context context;
 	private ArrayList<Version> versions;
+	private boolean singleVersion;
 	
-	public VersionListAdapter(Context context, ArrayList<Version> versions){
+	public VersionListAdapter(Context context, ArrayList<Version> versions, boolean singleVersion){
 		this.context = context;
 		this.versions = versions;
+		this.singleVersion = singleVersion;
 	}
 	
 	public int getItemPositionById(int id)
@@ -52,7 +54,14 @@ public class VersionListAdapter extends BaseAdapter {
 		LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);        
         Version version = versions.get(position);
 		if(!version.getIsGroupHeader())		{
-			convertView = mInflater.inflate(R.layout.version_item, parent, false);
+			if(this.singleVersion) {
+				convertView = mInflater.inflate(R.layout.version_item, parent, false);
+				
+			}
+			//else {
+				//convertView = mInflater.inflate(R.layout.version_select_item, parent, false);
+				//CheckBox chkSelected = (CheckBox) convertView.findViewById(R.id.version_select); 
+			//}
 			TextView txtNameText = (TextView) convertView.findViewById(R.id.version_text); 
 			TextView txtShortName = (TextView) convertView.findViewById(R.id.txt_short_name);
 	        String VersionText = version.getName();
