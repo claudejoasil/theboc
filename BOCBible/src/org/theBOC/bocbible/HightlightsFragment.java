@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ListView;
@@ -45,6 +46,7 @@ public class HightlightsFragment extends Fragment {
 				mProgressDialog.setMessage("please wait...");
 				mProgressDialog.setIndeterminate(true);
 				mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+				mProgressDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
 				highlightsTask.execute("");
 			}
 

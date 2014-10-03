@@ -6,7 +6,7 @@ import android.content.Context;
 
 public class BOCdb extends SQLiteAssetHelper{
 	private static final String DATABASE_NAME = "theBOC.db";
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 3;
 	private static BOCdb dbInstance;
 	
 	private BOCdb(Context context) {
