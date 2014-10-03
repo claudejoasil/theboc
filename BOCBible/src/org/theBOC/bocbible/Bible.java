@@ -122,6 +122,14 @@ public class Bible  extends Fragment {
         super.onPause();
         bibleHelper.persistCurrentValues();
     }
+	
+	@Override
+	public void onDestroy() {
+	    super.onDestroy();
+	    if (bibleDB != null) {
+	    	bibleDB.close();
+	    }
+	}
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.bible, menu);
@@ -260,8 +268,10 @@ public class Bible  extends Fragment {
 		{
 			MenuItem itemBookChapter = menu.findItem(R.id.action_bible_book_chapter);
 			MenuItem itemVersion = menu.findItem(R.id.action_bible_version);
-			itemBookChapter.setTitle(this.currentBookObj.getName() + " " +  bibleHelper.getCurrentChapter(1));
-			itemVersion.setTitle(currentVersionObj.getShortName());
+			String bookName = this.currentBookObj != null ? this.currentBookObj.getName() : "";
+			String versionName = currentVersionObj != null ? currentVersionObj.getShortName() : "";
+			itemBookChapter.setTitle(bookName + " " +  bibleHelper.getCurrentChapter(1));
+			itemVersion.setTitle(versionName);
 		}
 	}
 	private void bindBible(int textSizeIncrement)
