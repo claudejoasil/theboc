@@ -51,6 +51,8 @@ public class BibleHelper {
 		this.currentVerse = 0;
 		this.currentLanguage = "";
 		this.currentVersionId = 0;
+		this.currentVersionId2 = 0;
+		this.currentVersionName2 = "";
 		this.currentVersionName = "";
 		this.currentTestament = 0;
 		this.currentTextSize = 0;

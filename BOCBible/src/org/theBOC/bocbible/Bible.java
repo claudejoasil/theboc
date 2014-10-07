@@ -343,19 +343,20 @@ public class Bible  extends Fragment {
 	    @Override
 	    protected VerseListAdapter doInBackground(Integer... textSize) {
 	        String[] dualVersions = new String[2];
-	        //bibleHelper.setCurrentVersionId2(4);
-	        //bibleHelper.setCurrentVersionName2("KJV");
 	        dualVersions[0] = currentVersionObj.getShortName();
+	        if(bibleHelper.getCurrentVersionId2() > 0)
+			{
+				dualVersions[1] = bibleHelper.getCurrentVersionName2();
+			}
 	    	if(textSize[0] == 0)
 	    	{
 				if(bibleHelper.getCurrentVersionId2() > 0)
 				{
-					dualVersions[1] = bibleHelper.getCurrentVersionName2();
 					m_verses = bibleDB.getDualVersionVerses(bibleHelper.getCurrentBookId(1), bibleHelper.getCurrentChapter(1), dualVersions);
 	    		}
 				else
 				{
-					m_verses = bibleDB.getVerses(bibleHelper.getCurrentBookId(1), bibleHelper.getCurrentChapter(1), currentVersionObj.getShortName());
+					m_verses = bibleDB.getVerses(bibleHelper.getCurrentBookId(1), bibleHelper.getCurrentChapter(1), dualVersions[0]);
 				}
 	    	}
 	    	m_textSize += textSize[0];
