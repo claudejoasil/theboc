@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.theBOC.bocbible"
-    android:versionCode="7"
+    android:versionCode="11"
     android:versionName="1.1.0" >
 
     <uses-sdk
@@ -35,20 +35,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Bible"
-            android:label="@string/title_activity_bible"
-            android:parentActivityName=".Home" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="org.theBOC.bocbible.Home" />
-        </activity>
-        <!-- <activity android:uiOptions="splitActionBarWhenNarrow" -->
-        <!-- android:name="org.theBOC.theboc.Bible" -->
-        <!-- android:label="@string/title_activity_bible" -->
-        <!-- android:parentActivityName="org.theBOC.theboc.Home" > -->
-        <!-- <meta-data android:name="android.support.UI_OPTIONS" android:value="splitActionBarWhenNarrow" /> -->
-        <!-- </activity> -->
-        <activity
             android:name=".Books"
             android:label="@string/title_activity_books"
             android:noHistory="true" >
@@ -57,18 +43,6 @@
             android:name=".Versions"
             android:label="@string/title_activity_versions"
             android:noHistory="true" >
-        </activity>
-        <activity
-            android:name=".About"
-            android:label="@string/title_activity_about"
-            android:parentActivityName="android.support.v4.app.FragmentActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="android.support.v4.app.FragmentActivity" />
-        </activity>
-        <activity
-            android:name=".HightlightsFragment"
-            android:label="@string/title_activity_hightlights_fragment" >
         </activity>
     </application>
 

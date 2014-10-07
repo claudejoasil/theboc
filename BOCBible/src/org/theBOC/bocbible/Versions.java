@@ -11,12 +11,12 @@ import java.util.ArrayList;
 import org.theBOC.bocbible.BOCDialogFrag.BOCDialogFragListener;
 import org.theBOC.bocbible.R;
 import org.theBOC.bocbible.Adapters.VersionListAdapter;
+import org.theBOC.bocbible.Adapters.VersionListAdapter.ParallelVersionsListener;
 import org.theBOC.bocbible.Models.Version;
 import org.theBOC.bocbible.common.BibleHelper;
 import org.theBOC.bocbible.common.MiscHelper;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -32,18 +32,37 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.view.View;
+import android.view.View.OnClickListener;
 
 public class Versions extends FragmentActivity {
 	private static org.theBOC.bocbible.database.Version versionDB;
 	private ListView lstView;
+	private LinearLayout parallelVersionControls;
+	private TextView txtVersion_1;
+	private TextView txtVersion_2;
+	private Button btnSwitch;
+	private Button btnDone;
+	private RadioButton radioSingleVersion;
+	private RadioButton radioParallelVersions;
 	private ArrayList<Version> versions;
 	private BibleHelper bibleHelper;
 	private MiscHelper miscHelper;
 	private Version m_clickedVersion;
 	private static ProgressDialog mProgressDialog;
+	private static int singleVersion = -1; // Value is not set yet that takes care of phone orientation change which would have an undesirable behavior
+	private static Version mVersion_1 = null;
+	private static Version mVersion_2 = null;
+	private int numVersionsSelected = 1; // The currentVersion is selected by default
+	private VersionListAdapter adt;
 	public static final String versionBaseUrl = "http://www.theboc.org/downloads/bible";
 	
 	@Override
@@ -53,21 +72,17 @@ public class Versions extends FragmentActivity {
 		final ActionBar actionBar = getActionBar();
 		actionBar.setDisplayShowHomeEnabled(false);
 		actionBar.setTitle("Bible Versions");
-		if(versionDB == null)
-			versionDB = new org.theBOC.bocbible.database.Version(this);
-		versions = versionDB.getVersions(null, true, false);
-		lstView = (ListView) findViewById(R.id.lst_bible_versions);
+		bibleHelper = BibleHelper.getInstance(this);
+		miscHelper = MiscHelper.getInstance(this);
+		this.initControls();
 		int[] colors = {0, 0xFFCCCCCC, 0}; 
 		lstView.setDivider(new GradientDrawable(Orientation.RIGHT_LEFT, colors));
 		lstView.setDividerHeight(1);
-		final Context context = this;
-		miscHelper = MiscHelper.getInstance(context);
 		lstView.setOnItemClickListener(new OnItemClickListener() 
 		{
-	          public void onItemClick(AdapterView<?> parent, View view, int position, long id) 
+	          public void onItemClick(AdapterView<?> parent, final View view, int position, long id) 
 	          {
 	        	  m_clickedVersion = versions.get(position);
-	        	  bibleHelper = BibleHelper.getInstance(context);
 	        	  if(!m_clickedVersion.getIsGroupHeader())
 	        	  {
 	        		  if(m_clickedVersion.getIsAvailable())
@@ -75,8 +90,11 @@ public class Versions extends FragmentActivity {
 		        		  bibleHelper.setCurrentVersionId(m_clickedVersion.getId());
 		        		  bibleHelper.setCurrentVersionName(m_clickedVersion.getShortName());
 		        		  bibleHelper.setCurrentLanguage(m_clickedVersion.getLanguage());
+		        		  bibleHelper.setCurrentVersionId2(-1);
+		        		  bibleHelper.setCurrentVersionName2("");
 		        		  miscHelper.reloadBiblePage = true;
-		        		  ((Activity) context).finish();
+		        		  
+		        		  unsetValuesAndFinish();
 	        		  }
 	        		  else
 	        		  {
@@ -88,7 +106,7 @@ public class Versions extends FragmentActivity {
 	        			  BOCDialogFragListener listener = new BOCDialogFragListener() {
 							@Override
 							public void onDialogPositiveClick(DialogFragment dialog) {
-								final InstallNewVersionTask newVersionTask = new InstallNewVersionTask(Versions.this);
+								final InstallNewVersionTask newVersionTask = new InstallNewVersionTask(Versions.this, view);
 								  String versionUrl = versionBaseUrl + m_clickedVersion.getShortName() + ".sql";
 								  newVersionTask.execute(versionUrl);
 
@@ -113,8 +131,11 @@ public class Versions extends FragmentActivity {
 	        	  }
 	          }
 		});
-		VersionListAdapter adt = new VersionListAdapter(this, versions, true);
-		lstView.setAdapter(adt);
+		if(radioParallelVersions.isChecked())
+		{
+			parallelVersionControls.setVisibility(LinearLayout.VISIBLE);
+		}
+		this.bindVersions();
 		mProgressDialog = new ProgressDialog(Versions.this);
 		mProgressDialog.setMessage("Installing please wait...");
 		mProgressDialog.setIndeterminate(true);
@@ -131,28 +152,202 @@ public class Versions extends FragmentActivity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
 			return true;
 		}
 		if (id == R.id.action_cancel) {
 			miscHelper.reloadBiblePage = false;
-			this.finish();
+			unsetValuesAndFinish();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	private void bindVersions()
+	{
+		if(versions == null) 
+		{
+			if(versionDB == null)
+				versionDB = new org.theBOC.bocbible.database.Version(this);
+			versions = versionDB.getVersions(null, true, false);
+		}
+		ParallelVersionsListener listener = new ParallelVersionsListener() {
+			@Override
+			public void onCheckedChanged(Version version, CompoundButton buttonView, boolean isChecked) {
+				if(!isChecked)
+				{
+					if(version.getShortName().equalsIgnoreCase((String) txtVersion_1.getText()))
+					{
+						txtVersion_1.setText("?");
+						mVersion_1 = null;
+					}
+					if(version.getShortName().equalsIgnoreCase((String) txtVersion_2.getText()))
+					{
+						txtVersion_2.setText("?");
+						mVersion_2 = null;
+					}
+					if(numVersionsSelected == 2)
+						enableAll();
+					numVersionsSelected --;
+				}
+				else
+				{
+					if(txtVersion_1.getText().equals("?"))
+					{
+						txtVersion_1.setText(version.getShortName());
+						mVersion_1 = version;
+					}
+					else if(txtVersion_2.getText().equals("?"))
+					{
+						txtVersion_2.setText(version.getShortName());
+						mVersion_2 = version;
+					}
+					numVersionsSelected ++;
+					if(numVersionsSelected >= 2)
+					{
+						disableUnchecked();
+					}
+				}
+				if(adt != null)
+				{
+					adt.setVersionNames((String)txtVersion_1.getText(), (String)txtVersion_2.getText());
+				}
+			}
+		};
+		adt = new VersionListAdapter(this, this.versions, radioSingleVersion.isChecked(), (String)txtVersion_1.getText(), (String)txtVersion_2.getText(), listener);
+		lstView.setAdapter(adt);
+	}
 	
+	private void initControls()
+	{
+		parallelVersionControls = (LinearLayout) findViewById(R.id.parallel_versions_controls);
+		lstView = (ListView) findViewById(R.id.lst_bible_versions);
+		radioSingleVersion = (RadioButton) findViewById(R.id.radio_single_version);
+		radioSingleVersion.setOnClickListener(new VersionsControlsClickListener());
+		radioParallelVersions = (RadioButton) findViewById(R.id.radio_parallel_versions);
+		radioParallelVersions.setOnClickListener(new VersionsControlsClickListener());
+		txtVersion_1 = (TextView) findViewById(R.id.txt_version_1);
+		txtVersion_2 = (TextView) findViewById(R.id.txt_version_2);
+		if(singleVersion == -1) // Fix orientation change issue
+		{
+			radioSingleVersion.setChecked(bibleHelper.getCurrentVersionId2() <= 0);
+			radioParallelVersions.setChecked(bibleHelper.getCurrentVersionId2() > 0);
+		}
+		else
+		{
+			radioSingleVersion.setChecked(singleVersion == 1);
+			radioParallelVersions.setChecked(singleVersion == 0);
+		}
+		
+		btnDone = (Button) findViewById(R.id.btnDone);
+		btnSwitch = (Button) findViewById(R.id.btnSwitchVersion);
+		if(versionDB == null)
+			versionDB = new org.theBOC.bocbible.database.Version(this);
+		if(mVersion_1 == null)
+		{
+			mVersion_1 = versionDB.getVersion(bibleHelper.getCurrentVersionId(4), null);
+		}
+		if(mVersion_2 == null)
+		{
+			mVersion_2 = versionDB.getVersion(bibleHelper.getCurrentVersionId2(), null);
+		}
+		txtVersion_1.setText(mVersion_1.getShortName());
+		if(mVersion_2 == null || mVersion_2.getShortName().equals(""))
+		{
+			txtVersion_2.setText("?");
+		}
+		else
+		{
+			txtVersion_2.setText(mVersion_2.getShortName());
+			numVersionsSelected = 2;
+		}
+		btnDone.setOnClickListener(new VersionsControlsClickListener());
+		btnSwitch.setOnClickListener(new VersionsControlsClickListener());
+	}
+	public void disableUnchecked()
+	{
+		if(adt == null) return;
+		for(int i = 0; i < adt.getCount(); i++)
+		{
+			adt.chkIsEnable[i] = false;
+		}
+		adt.notifyDataSetChanged();
+	}
+	public void enableAll()
+	{
+		if(adt == null) return;
+		for(int i = 0; i < adt.getCount(); i++)
+		{
+			adt.chkIsEnable[i] = true;
+		}
+		adt.notifyDataSetChanged();
+
+	}
+	public class VersionsControlsClickListener implements OnClickListener
+	{
+		public VersionsControlsClickListener()
+		{
+			
+		}
+		@Override
+		public void onClick(View v) {
+			switch(v.getId())
+			{
+				case R.id.radio_single_version:
+					parallelVersionControls.setVisibility(LinearLayout.GONE);
+					singleVersion = 1;
+					bindVersions();
+					break;
+				case R.id.radio_parallel_versions:
+					parallelVersionControls.setVisibility(LinearLayout.VISIBLE);
+					singleVersion = 0;
+					bindVersions();
+					break;
+				case R.id.btnSwitchVersion:
+					if(txtVersion_1 != null && txtVersion_2 != null)
+					{
+						Version tempVersion = mVersion_1;
+						mVersion_1 = mVersion_2;
+						mVersion_2 = tempVersion;
+						txtVersion_1.setText(mVersion_1 == null ? "?" : mVersion_1.getShortName());
+						txtVersion_2.setText(mVersion_2 == null ? "?" : mVersion_2.getShortName());
+					}
+					break;
+				case R.id.btnDone:
+					if(mVersion_1 != null && mVersion_2 != null)
+					{
+						bibleHelper.setCurrentVersionId(mVersion_1.getId());
+						bibleHelper.setCurrentVersionName(mVersion_1.getShortName());
+						bibleHelper.setCurrentLanguage(mVersion_1.getLanguage());
+						bibleHelper.setCurrentVersionId2(mVersion_2.getId());
+						bibleHelper.setCurrentVersionName2(mVersion_2.getShortName());
+						miscHelper.reloadBiblePage = true;
+					}
+					else
+					{
+						miscHelper.reloadBiblePage = false;
+					}
+					unsetValuesAndFinish();
+	        		break;
+			}
+		}
+	}
+	private void unsetValuesAndFinish()
+	{
+		singleVersion = -1;
+		mVersion_1 = null;
+		mVersion_2 = null;
+		this.finish();
+	}
 	private class InstallNewVersionTask extends AsyncTask<String, Integer, String> {
 
 	    private Context context;
 	    private PowerManager.WakeLock mWakeLock;
+	    private View view;
 
-	    public InstallNewVersionTask(Context context) {
+	    public InstallNewVersionTask(Context context, View view) {
 	        this.context = context;
+	        this.view = view;
 	    }
 
 	    @Override
@@ -241,12 +436,29 @@ public class Versions extends FragmentActivity {
 	        else
 	        {
 	        	versionDB.setVersionAvailable(m_clickedVersion.getId());
-                bibleHelper.setCurrentVersionId(m_clickedVersion.getId());
-                bibleHelper.setCurrentVersionName(m_clickedVersion.getShortName());
-                bibleHelper.setCurrentLanguage(m_clickedVersion.getLanguage());
-                Toast.makeText(context, m_clickedVersion.getName() + " installed!", Toast.LENGTH_LONG).show();
-                miscHelper.reloadBiblePage = true;
-                ((Activity) context).finish();
+	        	if(!radioSingleVersion.isChecked() && adt != null)
+	        	{
+	        		adt.setVersionAvailable(m_clickedVersion.getId());
+	        		adt.notifyDataSetChanged();
+	        		if(this.view != null && numVersionsSelected < 2)
+	        		{
+	        			CheckBox viewChkBox = (CheckBox) view.findViewById(R.id.version_select);
+	        			if(viewChkBox != null)
+	        			{
+	        				viewChkBox.performClick();
+	        			}
+	        		}
+	                Toast.makeText(context, m_clickedVersion.getName() + " installed!", Toast.LENGTH_LONG).show();
+	        	}
+	        	else
+	        	{
+	                bibleHelper.setCurrentVersionId(m_clickedVersion.getId());
+	                bibleHelper.setCurrentVersionName(m_clickedVersion.getShortName());
+	                bibleHelper.setCurrentLanguage(m_clickedVersion.getLanguage());
+	                miscHelper.reloadBiblePage = true;
+	                unsetValuesAndFinish();
+	                Toast.makeText(context, m_clickedVersion.getName() + " installed!", Toast.LENGTH_LONG).show();
+	        	}
 	        }
 	    }
 	}
