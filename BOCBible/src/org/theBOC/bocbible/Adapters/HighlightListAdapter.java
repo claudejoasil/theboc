@@ -28,14 +28,19 @@ public class HighlightListAdapter extends BaseAdapter{
 	private Context context;
 	private ArrayList<Bible> verses;
 	private BOCDialogFrag4Activity dialFrag;
-	//private static String version;
+	private boolean hideUnHighlight;
 	
 	public HighlightListAdapter(Context context, ArrayList<Bible> verses){
 		this.context = context;
 		this.verses = verses;
-		//version = theVersion;
+		this.hideUnHighlight = false;
 	}
-
+	
+	public HighlightListAdapter(Context context, ArrayList<Bible> verses, boolean hideUnhighlight){
+		this.context = context;
+		this.verses = verses;
+		this.hideUnHighlight = hideUnhighlight;
+	}
 	
 	@Override
 	public int getCount() {
@@ -64,34 +69,40 @@ public class HighlightListAdapter extends BaseAdapter{
         TextView txtHighLightVerseReference = (TextView) convertView.findViewById(R.id.txt_highlight_verse_reference); 
         Button btnUnhighLight = (Button) convertView.findViewById(R.id.btnDeleteHighlight);
         Button btnReadOn = (Button) convertView.findViewById(R.id.btnReadChapter);
-        btnUnhighLight.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				dialFrag = new BOCDialogFrag4Activity();
-				dialFrag.setBtnNegativeText(context.getResources().getString(R.string.cancel));
-				dialFrag.setBtnPositiveText(context.getResources().getString(R.string.yes));
-				dialFrag.setDialogMessage("Are you sure you want to unhighlight this verse");
-				BOCDialogFrag4ActivityListener listener = new BOCDialogFrag4ActivityListener() {
-					
-					@Override
-					public void onDialogPositiveClick(DialogFragment dialog) {
-						org.theBOC.bocbible.database.Bible bibleDB = new org.theBOC.bocbible.database.Bible(context);
-					  	bibleDB.UnHightLightVerse(verses.get(position).getPk(), verses.get(position).getVersion().getShortName());
-					  	verses.remove(position);
-					  	notifyDataSetChanged();
-					}
-					
-					@Override
-					public void onDialogNegativeClick(DialogFragment dialog) {
-						// TODO Auto-generated method stub
-						
-					}
-				};
-				dialFrag.setListener(listener);
-				FragmentManager fragmentManager = ((Activity)context).getFragmentManager();
-				dialFrag.show(fragmentManager, "UNHIGHLIGHT_VERSE");
-			}
-		});
+        if(this.hideUnHighlight){
+        	btnUnhighLight.setVisibility(Button.GONE);
+        }
+        else {
+        	btnUnhighLight.setOnClickListener(new OnClickListener() {
+    			@Override
+    			public void onClick(View v) {
+    				dialFrag = new BOCDialogFrag4Activity();
+    				dialFrag.setBtnNegativeText(context.getResources().getString(R.string.cancel));
+    				dialFrag.setBtnPositiveText(context.getResources().getString(R.string.yes));
+    				dialFrag.setDialogMessage("Are you sure you want to unhighlight this verse");
+    				BOCDialogFrag4ActivityListener listener = new BOCDialogFrag4ActivityListener() {
+    					
+    					@Override
+    					public void onDialogPositiveClick(DialogFragment dialog) {
+    						org.theBOC.bocbible.database.Bible bibleDB = new org.theBOC.bocbible.database.Bible(context);
+    					  	bibleDB.UnHightLightVerse(verses.get(position).getPk(), verses.get(position).getVersion().getShortName());
+    					  	verses.remove(position);
+    					  	notifyDataSetChanged();
+    					}
+    					
+    					@Override
+    					public void onDialogNegativeClick(DialogFragment dialog) {
+    						// TODO Auto-generated method stub
+    						
+    					}
+    				};
+    				dialFrag.setListener(listener);
+    				FragmentManager fragmentManager = ((Activity)context).getFragmentManager();
+    				dialFrag.show(fragmentManager, "UNHIGHLIGHT_VERSE");
+    			}
+    		});
+        }
+        
         
         btnReadOn.setOnClickListener(new OnClickListener() {
 			@Override

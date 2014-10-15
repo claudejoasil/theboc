@@ -25,7 +25,7 @@ public class Version extends DbBase {
 			where = (where == null ? "" : where) + "ZISAVAILABLE=1";
 		}
 		qb.setTables(sqlTables);
-		Cursor c = qb.query(DB, sqlSelect, where, null, null, null, null);
+		Cursor c = qb.query(DB, sqlSelect, where, null, null, null, "ZLANGUAGE");
 		c.moveToFirst();
 		ArrayList<org.theBOC.bocbible.Models.Version> versions = new ArrayList<org.theBOC.bocbible.Models.Version>();
 		if (c.moveToFirst()) {

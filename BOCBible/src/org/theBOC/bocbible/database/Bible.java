@@ -181,4 +181,48 @@ public class Bible extends DbBase {
 		}
 		return verses;
 	}
+	
+	public ArrayList<org.theBOC.bocbible.Models.Bible> search(String query, int testament, org.theBOC.bocbible.Models.Version version)
+	{
+		SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+		
+		String [] sqlSelect = {"docid", "ZVERSE", "ZVERSETEXT, ZBOOK, ZCHAPTER, ZBOOKID"};
+		String sqlTables = "ZBIBLE" + version.getShortName() + "_FTS";
+		String where = " ZVERSETEXT MATCH '*" + query + "*' ";
+		if(testament == 2)
+		{
+			where += " AND ZBOOKID > 39 ";  
+		}
+		if(testament == 1)
+		{
+			where += " AND ZBOOKID <= 39 ";  
+		}
+		ArrayList<org.theBOC.bocbible.Models.Bible> verses = new ArrayList<org.theBOC.bocbible.Models.Bible>();
+		qb.setTables(sqlTables);
+		try
+		{
+			Cursor c = qb.query(DB, sqlSelect, where, null, null, null, null);
+			c.moveToFirst();
+			
+			if (c.moveToFirst()) {
+	            do {
+	            	org.theBOC.bocbible.Models.Bible bible = new org.theBOC.bocbible.Models.Bible();
+	            	bible.setPk(c.getInt(0));
+	                bible.setVerse(c.getInt(1));
+	                bible.setVerseText(c.getString(2));
+	                //bible.setHighLights(c.getString(3));
+	                bible.setBook(c.getString(3));
+	                bible.setChapter(c.getInt(4));
+	                bible.setBookId(c.getInt(5));
+	                bible.setVersion(version);
+	                verses.add(bible);
+	            } while (c.moveToNext());
+	        }
+		}
+		catch(Exception e)
+		{
+			
+		}
+		return verses;
+	}
 }
