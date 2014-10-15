@@ -120,6 +120,7 @@ public class Bible  extends Fragment {
 	@Override
 	public void onPause() {
         super.onPause();
+        miscHelper.reloadBiblePage = false;
         bibleHelper.persistCurrentValues();
     }
 	

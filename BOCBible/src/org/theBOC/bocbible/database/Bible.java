@@ -44,10 +44,19 @@ public class Bible extends DbBase {
 	public ArrayList<org.theBOC.bocbible.Models.Bible> getDualVersionVerses(int bookId, int chapter, String[] version) 
 	{
 
+		int numChapter1 = this.GetNumVerses(bookId, chapter, version[0]);
+		int numChapter2 = this.GetNumVerses(bookId, chapter, version[1]);
 		String query = "SELECT B1.Z_PK, B1.ZVERSE, B1.ZVERSETEXT, B2.ZVERSETEXT, B1.ZHIGHLIGHT, B2.ZHIGHLIGHT " +
 				" FROM ZBIBLE" + version[0] + " B1 " +
-				" INNER JOIN ZBIBLE" + version[1] + " B2 ON B1.ZBOOKID=B2.ZBOOKID AND B1.ZCHAPTER=B2.ZCHAPTER AND B1.ZVERSE = B2.ZVERSE " +
+				" LEFT JOIN ZBIBLE" + version[1] + " B2 ON B1.ZBOOKID=B2.ZBOOKID AND B1.ZCHAPTER=B2.ZCHAPTER AND B1.ZVERSE = B2.ZVERSE " +
 				" WHERE B1.ZBOOKID=" + bookId + " AND B1.ZCHAPTER=" + chapter;
+		if(numChapter1 < numChapter2)
+		{
+			query = "SELECT B2.Z_PK, B2.ZVERSE, B1.ZVERSETEXT, B2.ZVERSETEXT, B1.ZHIGHLIGHT, B2.ZHIGHLIGHT " +
+					" FROM ZBIBLE" + version[1] + " B2 " +
+					" LEFT JOIN ZBIBLE" + version[0] + " B1 ON B2.ZBOOKID=B1.ZBOOKID AND B2.ZCHAPTER=B1.ZCHAPTER AND B2.ZVERSE = B1.ZVERSE " +
+					" WHERE B2.ZBOOKID=" + bookId + " AND B2.ZCHAPTER=" + chapter;
+		}
 		ArrayList<org.theBOC.bocbible.Models.Bible> verses = new ArrayList<org.theBOC.bocbible.Models.Bible>();
 		try
 		{
@@ -58,7 +67,7 @@ public class Bible extends DbBase {
 	            do {
 	            	org.theBOC.bocbible.Models.Bible bible = new org.theBOC.bocbible.Models.Bible();
 	            	bible.setPk(c.getInt(0));
-	                bible.setVerse(Integer.parseInt(c.getString(1)));
+	                bible.setVerse(c.getInt(1));
 	                bible.setVerseText(c.getString(2));
 	                bible.setVerseText2(c.getString(3));
 	                bible.setHighLights(c.getString(4));

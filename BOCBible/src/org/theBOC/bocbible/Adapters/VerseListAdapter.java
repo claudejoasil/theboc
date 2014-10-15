@@ -106,16 +106,18 @@ public class VerseListAdapter extends BaseAdapter {
         //TextView txtVerse = (TextView) convertView.findViewById(R.id.verse_number);
         TextView txtVerseText1 = (TextView) convertView.findViewById(R.id.verse_text_1); 
         TextView txtVerseText2 = (TextView) convertView.findViewById(R.id.verse_text_2); 
-        String VerseText = "<font color='#813f15'>" + 
+        String VerseText = bible.getVerseText() != null && !bible.getVerseText().trim().equals("") ? 
+        				   "<font color='#813f15'>" + 
         						Integer.toString(bible.getVerse()) + 
 						   "</font> " + 
-    						bible.getVerseText();
+    						bible.getVerseText() : "";
         String highLights = bible.getHighLights();
         
-        String VerseText2 = "<font color='#813f15'>" + 
-				Integer.toString(bible.getVerse()) + 
-		   "</font> " + 
-			bible.getVerseText2();
+        String VerseText2 = bible.getVerseText2() != null && !bible.getVerseText2().trim().equals("") ? 
+        		"<font color='#813f15'>" + 
+					Integer.toString(bible.getVerse()) + 
+			   "</font> " + 
+			bible.getVerseText2() : "";
         String highLights2 = bible.getHighLights2();
         if(position == 0)
         {
