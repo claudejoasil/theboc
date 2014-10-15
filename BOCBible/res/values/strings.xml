@@ -7,6 +7,7 @@
     <string-array name="menu_Items">
         <item>Home</item>
         <item>Read the Bible</item>
+        <item>Search the Bible</item>
         <!-- <item>BOC Reading Plan</item> -->
         <item>My Highlights</item>
         <item>About</item>
@@ -19,6 +20,7 @@
     <array name="menu_icons">
         <item>@drawable/ic_home</item>
         <item>@drawable/ic_bible</item>
+        <item>@drawable/ic_search</item>
         <!-- <item>@drawable/ic_reading_plan</item> -->
         <item>@drawable/ic_highlight</item>
         <item>@drawable/ic_about</item>
@@ -52,6 +54,7 @@
     <string name="and">And</string>
     <string name="done">Done</string>
     <string name="switc">Switch</string>
+    <string name="search">Search</string>
     <string name="slash">/</string>
     <string name="pipe">|</string>
     <string name="unhighlight">Unhighlight</string>
@@ -63,4 +66,5 @@
 With a very simple navigation, BOC Bible provides a very simple and intuitive user experience.\n\nWe have ensured that anyone with a basic Android experience can use the application without any problems.</string>
     <string name="title_activity_hightlights_fragment">Hightlights</string>
 	<string name="no_highLights_found">You currently have no highlights for this version</string>
+	<string name="no_result_found">No Result Found</string>
 </resources>

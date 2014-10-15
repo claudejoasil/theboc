@@ -44,6 +44,7 @@ public class Home extends Activity {
     private final String HIGHLIGHTSTAG = "HIGHLIGHTS_TAG";
     private final String ABOUTTAG = "ABOUT_TAG";
     private final String BIBLETAG = "BIBLE_TAG";
+    private final String SEARCHTAG = "SEARCH_TAG";
     private BOCDialogFrag4Activity dialFrag;
     private Context context;
     private Fragment frag;
@@ -67,6 +68,7 @@ public class Home extends Activity {
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[2], navMenuIcons.getResourceId(2, -1)));
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[3], navMenuIcons.getResourceId(3, -1)));
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[4], navMenuIcons.getResourceId(4, -1)));
+		navDrawerItems.add(new NavDrawerItem(navMenuTitles[5], navMenuIcons.getResourceId(5, -1)));
 		// Recycle the typed array
 		navMenuIcons.recycle();		
 		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
@@ -116,6 +118,12 @@ public class Home extends Activity {
         inflater.inflate(R.menu.home, menu);
         return super.onCreateOptionsMenu(menu);
     }
+    
+    //@Override
+    //public void onResume() {
+    	//if(mDrawerLayout.isDrawerOpen(Gravity.LEFT))
+ 		   //mDrawerLayout.closeDrawer(Gravity.LEFT);
+    //}
 
     /* Called whenever we call invalidateOptionsMenu() */
     @Override
@@ -161,6 +169,7 @@ public class Home extends Activity {
     }
 
     private void selectItem(int position) {
+    	getActionBar().setDisplayShowTitleEnabled(true);
         frag = null;
         String tag = "";
         String title = null;
@@ -171,22 +180,23 @@ public class Home extends Activity {
 	    		tag = HOMETAG;
 	    		break;
 	    	case 1:
-	    		//frag = new HomeFragment();
-	    		//tag = HOMETAG;
 	    		frag = new Bible();
 	    		tag = BIBLETAG;
 	    		title = "";
-	    		//this.gotoBible(null);
 	    		break;
 	    	case 2:
+	    		frag = new SearchFragment();
+	    		tag = SEARCHTAG;
+	    		break;
+	    	case 3:
 	    		frag = new HightlightsFragment();
 	    		tag = HIGHLIGHTSTAG;
 	    		break;
-	    	case 3:
+	    	case 4:
 	    		frag = new About();
 	    		tag = ABOUTTAG;
 	    		break;
-	    	case 4:
+	    	case 5:
 	    		dialFrag = new BOCDialogFrag4Activity();
 	    		dialFrag.setBtnNegativeText(getResources().getString(R.string.cancel));
 				dialFrag.setBtnPositiveText(getResources().getString(R.string.yes));
@@ -215,10 +225,8 @@ public class Home extends Activity {
     	{
 	        FragmentManager fragmentManager = getFragmentManager();
 	        fragmentManager.beginTransaction().replace(R.id.content_frame, frag, tag).commit();  
-	     // update selected item and title, then close the drawer
 	        mDrawerList.setItemChecked(position, true);
-	        if(title == null)
-	        	title = position != 0 ? navMenuTitles[position] : getString(R.string.the_bible);
+	        title = position != 0 ? navMenuTitles[position] : getString(R.string.the_bible);
 	        getActionBar().setTitle(title);
     	}
     	mDrawerLayout.closeDrawer(mDrawerList);
