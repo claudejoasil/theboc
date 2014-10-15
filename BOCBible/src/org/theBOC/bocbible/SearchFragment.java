@@ -31,6 +31,9 @@ public class SearchFragment extends Fragment {
 	private EditText editSearch;
 	private TextView txtResultForText;
 	private TextView txtSearchingVersion;
+	private static ArrayList<org.theBOC.bocbible.Models.Bible> mverses;
+	private static HighlightListAdapter madapter;
+	private static String mtxtQuery;
 	private static ProgressDialog mProgressDialog;
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		bibleDB = new Bible(this.getActivity());
@@ -49,22 +52,26 @@ public class SearchFragment extends Fragment {
 		txtResultForText = (TextView) rootView.findViewById(R.id.txtResultForText);
 		txtSearchingVersion = (TextView) rootView.findViewById(R.id.txtSearchingVersion);
 		txtSearchingVersion.setText("Searching version " + bibleHelper.getCurrentVersionName("KJV"));
+		if(mverses != null)
+		{
+			this.bindSearchList();
+		}
 		btnSearch.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 				imm.hideSoftInputFromWindow(editSearch.getWindowToken(),  0);
-				String query = editSearch.getText().toString();
-				if(query.trim().equals(""))
+				mtxtQuery= editSearch.getText().toString();
+				if(mtxtQuery.trim().equals(""))
 					return;
 				org.theBOC.bocbible.Models.Version version = versionDB.getVersion(bibleHelper.getCurrentVersionId(4), null);
-				final SearchTask SearchTask = new SearchTask(SearchFragment.this.getActivity(), version, 0);
+				final SearchTask SearchTask = new SearchTask(/*SearchFragment.this.getActivity(), */version, 0);
 				mProgressDialog = new ProgressDialog(SearchFragment.this.getActivity());
 				mProgressDialog.setMessage("please wait...");
 				mProgressDialog.setIndeterminate(true);
 				mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 				mProgressDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-				SearchTask.execute(query);
+				SearchTask.execute(mtxtQuery);
 			}
 		});
 	}
@@ -83,11 +90,11 @@ public class SearchFragment extends Fragment {
     }
 	
 	private class SearchTask extends AsyncTask<String, Integer, ArrayList<org.theBOC.bocbible.Models.Bible>> {
-	    private Context context;
+	    //private Context context;
 	    private org.theBOC.bocbible.Models.Version version;
 	    private int testament;
-	    public SearchTask(Context context, org.theBOC.bocbible.Models.Version version, int testament) {
-	        this.context = context;
+	    public SearchTask(/*Context context, */org.theBOC.bocbible.Models.Version version, int testament) {
+	        //this.context = context;
 	        this.version = version;
 	        this.testament = testament;
 	    }
@@ -118,20 +125,26 @@ public class SearchFragment extends Fragment {
 	    protected void onPostExecute(ArrayList<org.theBOC.bocbible.Models.Bible> verses) 
 	    {
 	    	mProgressDialog.dismiss();
-	    	if(verses.isEmpty())  
-	    	{
-	    		lstView.setVisibility(ListView.GONE);
-	    		txtView.setVisibility(TextView.VISIBLE);
-	    		txtResultForText.setVisibility(TextView.GONE);
-	    		return;
-	    	}
-	    	lstView.setVisibility(ListView.VISIBLE);
-    		txtView.setVisibility(TextView.GONE);
-    		txtResultForText.setText("Search results for '" + editSearch.getText().toString() + "'");
-    		editSearch.setText("");
-    		txtResultForText.setVisibility(TextView.VISIBLE);
-	    	HighlightListAdapter adt = new HighlightListAdapter(this.context, verses, true);
-			lstView.setAdapter(adt);
+	    	mverses = verses;
+	    	bindSearchList();
     	}
+	}
+	
+	private void bindSearchList()
+	{
+		if(mverses.isEmpty())  
+    	{
+    		lstView.setVisibility(ListView.GONE);
+    		txtView.setVisibility(TextView.VISIBLE);
+    		txtResultForText.setVisibility(TextView.GONE);
+    		return;
+    	}
+    	lstView.setVisibility(ListView.VISIBLE);
+		txtView.setVisibility(TextView.GONE);
+		txtResultForText.setText("Search results for '" + mtxtQuery + "'");
+		editSearch.setText("");
+		txtResultForText.setVisibility(TextView.VISIBLE);
+    	madapter = new HighlightListAdapter(this.getActivity(), mverses, true);
+		lstView.setAdapter(madapter);
 	}
 }
