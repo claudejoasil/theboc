@@ -194,9 +194,36 @@ public class Bible extends DbBase {
 	public ArrayList<org.theBOC.bocbible.Models.Bible> search(String query, int testament, org.theBOC.bocbible.Models.Version version)
 	{
 		SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-		
+		String sqlTables;
+		//TODO: Where we have more versions this solution will not be the best. 
+		//Keep it like this for now, indexing each bible version will make the app too big (****)
+		org.theBOC.bocbible.enums.Version enumVersion = org.theBOC.bocbible.enums.Version.valueOf(version.getShortName());
+		switch(enumVersion)
+		{
+			case ASV:
+			case WEB:
+			case ENDby:
+			case KJV:
+			case YLT:
+				sqlTables = "ZBIBLEKJV_FTS";
+				break;
+			case SAG:
+				sqlTables = "ZBIBLESAG_FTS";
+				break;
+			case LSG:
+			case FRDby:
+			case OSTER:
+			case Martin:
+				sqlTables = "ZBIBLELSG_FTS";
+				break;
+			case HCV:
+				sqlTables = "ZBIBLEHCV_FTS";
+				break;
+			default:
+				sqlTables = "ZBIBLE" + version.getShortName() + "_FTS";
+		}
 		String [] sqlSelect = {"docid", "ZVERSE", "ZVERSETEXT, ZBOOK, ZCHAPTER, ZBOOKID"};
-		String sqlTables = "ZBIBLE" + version.getShortName() + "_FTS";
+		//String sqlTables = "ZBIBLE" + version.getShortName() + "_FTS"; //****
 		String where = " ZVERSETEXT MATCH '*" + query + "*' ";
 		if(testament == 2)
 		{

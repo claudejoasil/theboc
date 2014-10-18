@@ -38,7 +38,7 @@ public class VerseListAdapter extends BaseAdapter {
 		versions = theVersions;
 		singleVersion = versions[1] == null;
 	}
-
+	
 	@Override
 	public int getCount() {
 		return verses.size();

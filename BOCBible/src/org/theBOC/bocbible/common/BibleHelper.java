@@ -10,6 +10,8 @@ public class BibleHelper {
 	public static final String Verse = "verseKey"; 
 	public static final String VersionId = "versionIdKey";
 	public static final String VersionName = "versionNameKey";
+	public static final String VersionId2 = "versionId2Key";
+	public static final String VersionName2 = "versionName2Key";
 	public static final String Language = "languageKey";
 	public static final String Testament = "testamentKey";
 	public static final String TextSize = "textSizeKey";
@@ -135,6 +137,8 @@ public class BibleHelper {
 	}
 	public int getCurrentVersionId2()
 	{
+		if(this.currentVersionId2 == 0)
+			this.currentVersionId2 = sharedpreferences.getInt(VersionId2, 0);
 		return this.currentVersionId2;
 	}
 	public void setCurrentVersionId2(int value)
@@ -153,6 +157,8 @@ public class BibleHelper {
 	}
 	public String getCurrentVersionName2()
 	{
+		if(this.currentVersionName2 == "")
+			this.currentVersionName2 = sharedpreferences.getString(VersionName2, "");
 		return this.currentVersionName2;
 	}
 	public void setCurrentVersionName2(String value)
@@ -225,6 +231,9 @@ public class BibleHelper {
 		
 		if(!this.currentVersionName.equalsIgnoreCase(""))
 			ed.putString(BibleHelper.VersionName, this.currentVersionName);
+		
+		ed.putInt(BibleHelper.VersionId2, this.currentVersionId2);
+		ed.putString(BibleHelper.VersionName2, this.currentVersionName2);
 		
 		if(this.currentTestament > 0)
 			ed.putInt(BibleHelper.Testament, this.currentTestament);

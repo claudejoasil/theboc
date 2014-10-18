@@ -50,7 +50,12 @@ public class Bible  extends Fragment {
 	private static org.theBOC.bocbible.database.Book bookDB;
 	private static org.theBOC.bocbible.database.Version versionDB;
 	private static ArrayList<org.theBOC.bocbible.Models.Bible> m_verses;
+	private static String[] dualVersions;
 	private static int m_textSize;
+	private static int mChapter;
+	private static int mBookId;
+	private static int mVersionId;
+	private static int mVersionId2;
 	ProgressDialog mProgressDialog;
 	View rootView;
 	
@@ -59,8 +64,8 @@ public class Bible  extends Fragment {
 		super.onCreate(savedInstanceState);
 		bibleHelper = BibleHelper.getInstance(this.getActivity());
 		miscHelper = MiscHelper.getInstance(this.getActivity());
-		miscHelper.reloadBiblePage = true;
 		this.initControls();
+		miscHelper.reloadBiblePage = true;
 		lstView.setOnItemClickListener(new OnItemClickListener() 
 		{
 	          public void onItemClick(AdapterView<?> parent, View view, int position, long id) 
@@ -271,20 +276,36 @@ public class Bible  extends Fragment {
 			MenuItem itemVersion = menu.findItem(R.id.action_bible_version);
 			String bookName = this.currentBookObj != null ? this.currentBookObj.getName() : "";
 			String versionName = currentVersionObj != null ? currentVersionObj.getShortName() : "";
+			if(bibleHelper.getCurrentVersionId2() > 0)
+			{
+				versionName += "-" + bibleHelper.getCurrentVersionName2();
+			}
 			itemBookChapter.setTitle(bookName + " " +  bibleHelper.getCurrentChapter(1));
 			itemVersion.setTitle(versionName);
 		}
 	}
 	private void bindBible(int textSizeIncrement)
 	{
+		if(m_verses != null && m_verses.size() > 0)
+    	{
+    		if(mBookId == bibleHelper.getCurrentBookId(0) && mChapter == bibleHelper.getCurrentChapter(0) && mVersionId == bibleHelper.getCurrentVersionId(0) && mVersionId2 == bibleHelper.getCurrentVersionId2())
+    		{
+    			m_textSize += textSizeIncrement;
+    			VerseListAdapter adt = new VerseListAdapter(this.getActivity(), m_verses, (float) m_textSize, dualVersions);
+    			lstView.setAdapter(adt);
+    			lstView.setSelection(bibleHelper.getCurrentVerse(1) - 1);
+    			return;
+    		}
+    	}
 		mProgressDialog = new ProgressDialog(Bible.this.getActivity());
 		mProgressDialog.setMessage("please wait...");
 		mProgressDialog.setIndeterminate(true);
 		mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-		mProgressDialog.setCancelable(false);
+		mProgressDialog.setCancelable(true);
 		mProgressDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
 		final GetBibleVersesTask getBibleVersesTask = new GetBibleVersesTask(Bible.this.getActivity());
 		getBibleVersesTask.execute(textSizeIncrement);
+		
 	}
 	private void initDB()
 	{
@@ -296,6 +317,7 @@ public class Bible  extends Fragment {
 	private void initControls()
 	{
 		lstView = (ListView) rootView.findViewById(R.id.lst_bible_verses);
+		lstView.setDivider(null);
 		btnMagnifyMinus = (ImageButton) rootView.findViewById(R.id.btnMagnifyMinus);
 		btnMagnifyMinus.setOnClickListener(new bottomButtonClickListener());
 		btnMagnifyPlus = (ImageButton) rootView.findViewById(R.id.btnMagnifyPlus);
@@ -335,16 +357,20 @@ public class Bible  extends Fragment {
             }
         });
 	}*/
-	private class GetBibleVersesTask extends AsyncTask<Integer, Integer, VerseListAdapter> {
+	private class GetBibleVersesTask extends AsyncTask<Integer, Integer, ArrayList<org.theBOC.bocbible.Models.Bible>> {
 	    private Context context;
 	    public GetBibleVersesTask(Context context) {
 	        this.context = context;
 	    }
 
 	    @Override
-	    protected VerseListAdapter doInBackground(Integer... textSize) {
-	        String[] dualVersions = new String[2];
+	    protected ArrayList<org.theBOC.bocbible.Models.Bible> doInBackground(Integer... textSize) {
+	        dualVersions = new String[2];
 	        dualVersions[0] = currentVersionObj.getShortName();
+	        mVersionId = currentVersionObj.getId();
+	        mVersionId2 = bibleHelper.getCurrentVersionId2();
+	        mBookId = bibleHelper.getCurrentBookId(1);
+	        mChapter = bibleHelper.getCurrentChapter(1);
 	        if(bibleHelper.getCurrentVersionId2() > 0)
 			{
 				dualVersions[1] = bibleHelper.getCurrentVersionName2();
@@ -361,8 +387,7 @@ public class Bible  extends Fragment {
 				}
 	    	}
 	    	m_textSize += textSize[0];
-	    	VerseListAdapter adt = new VerseListAdapter(this.context, m_verses, (float)m_textSize, dualVersions);
-	    	return adt;
+	    	return m_verses;
 	    }
 	    
 	    @Override
@@ -374,20 +399,18 @@ public class Bible  extends Fragment {
 	    @Override
 	    protected void onProgressUpdate(Integer... progress) {
 	        super.onProgressUpdate(progress);
-	        // if we get here, length is known, now set indeterminate to false
 	        mProgressDialog.setIndeterminate(false);
 	        mProgressDialog.setMax(100);
 	        mProgressDialog.setProgress(progress[0]);
 	    }
 
 	    @Override
-	    protected void onPostExecute(VerseListAdapter adt) {
-	        mProgressDialog.dismiss();
-	        lstView.setDivider(null);		
+	    protected void onPostExecute(ArrayList<org.theBOC.bocbible.Models.Bible> verses) {
+	    	mProgressDialog.dismiss();
+	        VerseListAdapter adt = new VerseListAdapter(this.context, verses, (float)m_textSize, dualVersions);
 			lstView.setAdapter(adt);
 			lstView.setSelection(bibleHelper.getCurrentVerse(1) - 1);
 			activeButtons(true);
-			//lstView.smoothScrollToPosition(bibleHelper.getCurrentVerse(1) - 1);
 	    }
 	}
 	private void activeButtons(boolean activate)
