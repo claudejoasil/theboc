@@ -3,11 +3,15 @@ package org.theBOC.bocbible;
 import java.util.ArrayList;
 import org.theBOC.bocbible.Adapters.HighlightListAdapter;
 import org.theBOC.bocbible.common.BibleHelper;
+import org.theBOC.bocbible.common.MiscHelper;
 import org.theBOC.bocbible.database.Bible;
 import org.theBOC.bocbible.database.Version;
+import org.theBOC.bocbible.enums.Language;
+
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -28,9 +32,9 @@ public class SearchFragment extends Fragment {
 	private ListView lstView;
 	private TextView txtView;
 	private Button btnSearch;
+	private TextView btnSearchingVersion;
 	private EditText editSearch;
 	private TextView txtResultForText;
-	private TextView txtSearchingVersion;
 	private static ArrayList<org.theBOC.bocbible.Models.Bible> mverses;
 	private static HighlightListAdapter madapter;
 	private static String mtxtQuery;
@@ -48,10 +52,18 @@ public class SearchFragment extends Fragment {
 		lstView = (ListView) rootView.findViewById(R.id.lst_bible_search);
 		txtView = (TextView) rootView.findViewById(R.id.no_result);
 		btnSearch = (Button) rootView.findViewById(R.id.btn_search);
+		btnSearchingVersion = (Button) rootView.findViewById(R.id.btnSearchingVersion);
 		editSearch = (EditText) rootView.findViewById(R.id.edit_search);
 		txtResultForText = (TextView) rootView.findViewById(R.id.txtResultForText);
-		txtSearchingVersion = (TextView) rootView.findViewById(R.id.txtSearchingVersion);
-		txtSearchingVersion.setText("Searching version " + bibleHelper.getCurrentVersionName("KJV"));
+		btnSearchingVersion.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent versionIntent = new Intent(SearchFragment.this.getActivity(), Versions.class);
+				versionIntent.putExtra("HIDEVERSIONOPTIONS", true);
+	    		startActivity(versionIntent);
+			}
+		});
+		
 		if(mverses != null)
 		{
 			this.bindSearchList();
@@ -71,10 +83,17 @@ public class SearchFragment extends Fragment {
 				mProgressDialog.setIndeterminate(true);
 				mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 				mProgressDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-				SearchTask.execute(mtxtQuery);
+				Language language = Language.valueOf(bibleHelper.getCurrentLanguage("English"));
+				String query = MiscHelper.prepareSearchQuery(language, mtxtQuery);
+				SearchTask.execute(query);
 			}
 		});
 	}
+	@Override
+	public void onResume(){
+        super.onResume();
+        btnSearchingVersion.setText(bibleHelper.getCurrentVersionName("KJV"));
+    }
 	
 	@Override
 	public void onStop(){

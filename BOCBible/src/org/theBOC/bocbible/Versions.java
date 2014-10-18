@@ -20,6 +20,7 @@ import android.app.ActionBar;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.GradientDrawable.Orientation;
 import android.os.AsyncTask;
@@ -38,6 +39,7 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.view.View;
@@ -53,6 +55,7 @@ public class Versions extends FragmentActivity {
 	private Button btnDone;
 	private RadioButton radioSingleVersion;
 	private RadioButton radioParallelVersions;
+	private RadioGroup radioGroupVersions;
 	private ArrayList<Version> versions;
 	private BibleHelper bibleHelper;
 	private MiscHelper miscHelper;
@@ -64,10 +67,13 @@ public class Versions extends FragmentActivity {
 	private int numVersionsSelected = 1; // The currentVersion is selected by default
 	private VersionListAdapter adt;
 	public static final String versionBaseUrl = "http://www.theboc.org/downloads/bible";
+	private boolean hideVersionOptions;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Intent intent = getIntent();
+		hideVersionOptions = intent.getBooleanExtra("HIDEVERSIONOPTIONS", false);
 		setContentView(R.layout.activity_versions);
 		final ActionBar actionBar = getActionBar();
 		actionBar.setDisplayShowHomeEnabled(false);
@@ -171,50 +177,56 @@ public class Versions extends FragmentActivity {
 				versionDB = new org.theBOC.bocbible.database.Version(this);
 			versions = versionDB.getVersions(null, true, false);
 		}
-		ParallelVersionsListener listener = new ParallelVersionsListener() {
-			@Override
-			public void onCheckedChanged(Version version, CompoundButton buttonView, boolean isChecked) {
-				if(!isChecked)
-				{
-					if(version.getShortName().equalsIgnoreCase((String) txtVersion_1.getText()))
+		
+		if(!hideVersionOptions)
+		{
+			ParallelVersionsListener listener = new ParallelVersionsListener() {
+				@Override
+				public void onCheckedChanged(Version version, CompoundButton buttonView, boolean isChecked) {
+					if(!isChecked)
 					{
-						txtVersion_1.setText("?");
-						mVersion_1 = null;
+						if(version.getShortName().equalsIgnoreCase((String) txtVersion_1.getText()))
+						{
+							txtVersion_1.setText("?");
+							mVersion_1 = null;
+						}
+						if(version.getShortName().equalsIgnoreCase((String) txtVersion_2.getText()))
+						{
+							txtVersion_2.setText("?");
+							mVersion_2 = null;
+						}
+						if(numVersionsSelected == 2)
+							enableAll();
+						numVersionsSelected --;
 					}
-					if(version.getShortName().equalsIgnoreCase((String) txtVersion_2.getText()))
+					else
 					{
-						txtVersion_2.setText("?");
-						mVersion_2 = null;
+						if(txtVersion_1.getText().equals("?"))
+						{
+							txtVersion_1.setText(version.getShortName());
+							mVersion_1 = version;
+						}
+						else if(txtVersion_2.getText().equals("?"))
+						{
+							txtVersion_2.setText(version.getShortName());
+							mVersion_2 = version;
+						}
+						numVersionsSelected ++;
+						if(numVersionsSelected >= 2)
+						{
+							disableUnchecked();
+						}
 					}
-					if(numVersionsSelected == 2)
-						enableAll();
-					numVersionsSelected --;
+					if(adt != null)
+					{
+						adt.setVersionNames((String)txtVersion_1.getText(), (String)txtVersion_2.getText());
+					}
 				}
-				else
-				{
-					if(txtVersion_1.getText().equals("?"))
-					{
-						txtVersion_1.setText(version.getShortName());
-						mVersion_1 = version;
-					}
-					else if(txtVersion_2.getText().equals("?"))
-					{
-						txtVersion_2.setText(version.getShortName());
-						mVersion_2 = version;
-					}
-					numVersionsSelected ++;
-					if(numVersionsSelected >= 2)
-					{
-						disableUnchecked();
-					}
-				}
-				if(adt != null)
-				{
-					adt.setVersionNames((String)txtVersion_1.getText(), (String)txtVersion_2.getText());
-				}
-			}
-		};
-		adt = new VersionListAdapter(this, this.versions, radioSingleVersion.isChecked(), (String)txtVersion_1.getText(), (String)txtVersion_2.getText(), listener);
+			};
+			adt = new VersionListAdapter(this, this.versions, radioSingleVersion.isChecked(), (String)txtVersion_1.getText(), (String)txtVersion_2.getText(), listener);
+		}
+		else
+			adt = new VersionListAdapter(this, this.versions, true, null, null, null);
 		lstView.setAdapter(adt);
 	}
 	
@@ -228,41 +240,49 @@ public class Versions extends FragmentActivity {
 		radioParallelVersions.setOnClickListener(new VersionsControlsClickListener());
 		txtVersion_1 = (TextView) findViewById(R.id.txt_version_1);
 		txtVersion_2 = (TextView) findViewById(R.id.txt_version_2);
-		if(singleVersion == -1) // Fix orientation change issue
+		radioGroupVersions = (RadioGroup) findViewById(R.id.rad_group_versions);
+		if(hideVersionOptions)
 		{
-			radioSingleVersion.setChecked(bibleHelper.getCurrentVersionId2() <= 0);
-			radioParallelVersions.setChecked(bibleHelper.getCurrentVersionId2() > 0);
+			radioGroupVersions.setVisibility(RadioGroup.GONE);
 		}
 		else
 		{
-			radioSingleVersion.setChecked(singleVersion == 1);
-			radioParallelVersions.setChecked(singleVersion == 0);
+			if(singleVersion == -1) // Fix orientation change issue
+			{
+				radioSingleVersion.setChecked(bibleHelper.getCurrentVersionId2() <= 0);
+				radioParallelVersions.setChecked(bibleHelper.getCurrentVersionId2() > 0);
+			}
+			else
+			{
+				radioSingleVersion.setChecked(singleVersion == 1);
+				radioParallelVersions.setChecked(singleVersion == 0);
+			}
+			
+			btnDone = (Button) findViewById(R.id.btnDone);
+			btnSwitch = (Button) findViewById(R.id.btnSwitchVersion);
+			if(versionDB == null)
+				versionDB = new org.theBOC.bocbible.database.Version(this);
+			if(mVersion_1 == null)
+			{
+				mVersion_1 = versionDB.getVersion(bibleHelper.getCurrentVersionId(4), null);
+			}
+			if(mVersion_2 == null)
+			{
+				mVersion_2 = versionDB.getVersion(bibleHelper.getCurrentVersionId2(), null);
+			}
+			txtVersion_1.setText(mVersion_1.getShortName());
+			if(mVersion_2 == null || mVersion_2.getShortName().equals(""))
+			{
+				txtVersion_2.setText("?");
+			}
+			else
+			{
+				txtVersion_2.setText(mVersion_2.getShortName());
+				numVersionsSelected = 2;
+			}
+			btnDone.setOnClickListener(new VersionsControlsClickListener());
+			btnSwitch.setOnClickListener(new VersionsControlsClickListener());
 		}
-		
-		btnDone = (Button) findViewById(R.id.btnDone);
-		btnSwitch = (Button) findViewById(R.id.btnSwitchVersion);
-		if(versionDB == null)
-			versionDB = new org.theBOC.bocbible.database.Version(this);
-		if(mVersion_1 == null)
-		{
-			mVersion_1 = versionDB.getVersion(bibleHelper.getCurrentVersionId(4), null);
-		}
-		if(mVersion_2 == null)
-		{
-			mVersion_2 = versionDB.getVersion(bibleHelper.getCurrentVersionId2(), null);
-		}
-		txtVersion_1.setText(mVersion_1.getShortName());
-		if(mVersion_2 == null || mVersion_2.getShortName().equals(""))
-		{
-			txtVersion_2.setText("?");
-		}
-		else
-		{
-			txtVersion_2.setText(mVersion_2.getShortName());
-			numVersionsSelected = 2;
-		}
-		btnDone.setOnClickListener(new VersionsControlsClickListener());
-		btnSwitch.setOnClickListener(new VersionsControlsClickListener());
 	}
 	public void disableUnchecked()
 	{
@@ -436,7 +456,7 @@ public class Versions extends FragmentActivity {
 	        else
 	        {
 	        	versionDB.setVersionAvailable(m_clickedVersion.getId());
-	        	if(!radioSingleVersion.isChecked() && adt != null)
+	        	if(!radioSingleVersion.isChecked() && !hideVersionOptions && adt != null)
 	        	{
 	        		adt.setVersionAvailable(m_clickedVersion.getId());
 	        		adt.notifyDataSetChanged();

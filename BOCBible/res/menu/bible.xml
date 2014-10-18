@@ -1,6 +1,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-    <item
-        android:id="@+id/action_bible_book_chapter"
+    <item android:id="@+id/action_bible_book_chapter"
         android:title="@null"
         android:showAsAction="always"/>
    
@@ -13,8 +12,8 @@
           android:icon="@drawable/ic_action_next"
           android:title="@null"
           android:showAsAction="always" />  -->
-    <item
-        android:id="@+id/action_bible_version"
+    
+    <item android:id="@+id/action_bible_version"
         android:title="@null"
         android:showAsAction="always"/>
 </menu>

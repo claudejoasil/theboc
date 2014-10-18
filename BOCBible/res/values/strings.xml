@@ -67,4 +67,6 @@ With a very simple navigation, BOC Bible provides a very simple and intuitive us
     <string name="title_activity_hightlights_fragment">Hightlights</string>
 	<string name="no_highLights_found">You currently have no highlights for this version</string>
 	<string name="no_result_found">No Result Found</string>
+	<string name="searching_version">Searching version</string>
+	<string name="tap_to_search">Tap to Search</string>
 </resources>
