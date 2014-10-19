@@ -163,7 +163,7 @@ public class SearchFragment extends Fragment {
 		txtResultForText.setText("Search results for '" + mtxtQuery + "'");
 		editSearch.setText("");
 		txtResultForText.setVisibility(TextView.VISIBLE);
-    	madapter = new HighlightListAdapter(this.getActivity(), mverses, true);
+    	madapter = new HighlightListAdapter(this.getActivity(), mverses, true, "");
 		lstView.setAdapter(madapter);
 	}
 }

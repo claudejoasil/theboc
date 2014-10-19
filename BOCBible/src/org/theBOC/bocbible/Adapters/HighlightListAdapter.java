@@ -29,17 +29,20 @@ public class HighlightListAdapter extends BaseAdapter{
 	private ArrayList<Bible> verses;
 	private BOCDialogFrag4Activity dialFrag;
 	private boolean hideUnHighlight;
+	private String verseTitle;
 	
 	public HighlightListAdapter(Context context, ArrayList<Bible> verses){
 		this.context = context;
 		this.verses = verses;
 		this.hideUnHighlight = false;
+		this.verseTitle = "";
 	}
 	
-	public HighlightListAdapter(Context context, ArrayList<Bible> verses, boolean hideUnhighlight){
+	public HighlightListAdapter(Context context, ArrayList<Bible> verses, boolean hideUnhighlight, String verseTitle){
 		this.context = context;
 		this.verses = verses;
 		this.hideUnHighlight = hideUnhighlight;
+		this.verseTitle = verseTitle;
 	}
 	
 	@Override
@@ -67,6 +70,15 @@ public class HighlightListAdapter extends BaseAdapter{
 		//mCurrentBibleObj = verses.get(position);
         TextView txtHighLightVerse = (TextView) convertView.findViewById(R.id.txt_highlight_verse);
         TextView txtHighLightVerseReference = (TextView) convertView.findViewById(R.id.txt_highlight_verse_reference); 
+        TextView txtVerseTitle = (TextView) convertView.findViewById(R.id.verse_title);
+        if(!this.verseTitle.equals(""))
+        {
+        	txtVerseTitle.setText(this.verseTitle);
+        }
+        else
+        {
+        	txtVerseTitle.setVisibility(TextView.GONE);
+        }
         Button btnUnhighLight = (Button) convertView.findViewById(R.id.btnDeleteHighlight);
         Button btnReadOn = (Button) convertView.findViewById(R.id.btnReadChapter);
         if(this.hideUnHighlight){
@@ -112,8 +124,11 @@ public class HighlightListAdapter extends BaseAdapter{
 				bibleHelper.setCurrentBookId(mCurrentBibleObj.getBookId());
 				bibleHelper.setCurrentChapter(mCurrentBibleObj.getChapter());
 				bibleHelper.setCurrentVerse(mCurrentBibleObj.getVerse());
-				bibleHelper.setCurrentVersionName(mCurrentBibleObj.getVersion().getShortName());
-				bibleHelper.setCurrentVersionId(mCurrentBibleObj.getVersion().getId());
+				if(bibleHelper.getCurrentVersionId2() == 0 || bibleHelper.getCurrentVersionId2() != mCurrentBibleObj.getVersion().getId())
+				{
+					bibleHelper.setCurrentVersionName(mCurrentBibleObj.getVersion().getShortName());
+					bibleHelper.setCurrentVersionId(mCurrentBibleObj.getVersion().getId());
+				}
 				bibleHelper.setCurrentTestament(mCurrentBibleObj.getBookId() <= 39 ? 1 : 2);
 				((org.theBOC.bocbible.Home) context).gotoBible(null);
 			}

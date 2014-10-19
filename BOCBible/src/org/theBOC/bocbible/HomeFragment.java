@@ -1,11 +1,15 @@
 package org.theBOC.bocbible;
 
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.theBOC.bocbible.R;
+import org.theBOC.bocbible.Adapters.HighlightListAdapter;
+import org.theBOC.bocbible.Models.Bible;
+import org.theBOC.bocbible.Models.Version;
 import org.theBOC.bocbible.common.BibleHelper;
 
 import android.os.AsyncTask;
@@ -16,14 +20,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class HomeFragment extends Fragment {
 
 	private static org.theBOC.bocbible.database.Bible bibleDB;
 	private BibleHelper bibleHelper;
-	private static TextView txtWeeklyVerse;
-	private static TextView txtWeeklyVerseReference;
+	private static ListView lstView;
 	private static int weekNumber;
 	public HomeFragment() {
     }
@@ -32,8 +36,7 @@ public class HomeFragment extends Fragment {
 		View rootView = inflater.inflate(R.layout.home_fragment, container, false);
 		bibleHelper = BibleHelper.getInstance(this.getActivity());
 		bibleDB = new org.theBOC.bocbible.database.Bible(this.getActivity());
-		txtWeeklyVerse = (TextView) rootView.findViewById(R.id.txt_weeklyVerse);
-		txtWeeklyVerseReference = (TextView) rootView.findViewById(R.id.txt_weeklyVerseReference);
+		lstView = (ListView) rootView.findViewById(R.id.lst_bible_weekly_verse);
 		Calendar calendar = new GregorianCalendar();
 	    calendar.setTime(new Date());
 	    weekNumber = calendar.get(Calendar.WEEK_OF_YEAR);
@@ -67,9 +70,21 @@ public class HomeFragment extends Fragment {
 	{
 		if(bibleHelper.getCurrentWeeklyBookId(4) > 0 && bibleHelper.getCurrentWeeklyVerseWeek(0) == weekNumber && bibleHelper.getCurrentWeeklyVerseVersion("KJV") == bibleHelper.getCurrentVersionName("KJV"))
 		{
-			txtWeeklyVerse.setText(bibleHelper.getCurrentWeeklyVerseText(""));
-			txtWeeklyVerseReference.setText(bibleHelper.getCurrentWeeklyBookName("") + 
-					" " + bibleHelper.getCurrentWeeklyChapter(0) + ":" + bibleHelper.getCurrentWeeklyVerse(0));
+			Bible bibleVerse = new Bible();
+			bibleVerse.setBookId(bibleHelper.getCurrentWeeklyBookId(4));
+			bibleVerse.setBook(bibleHelper.getCurrentWeeklyBookName(""));
+			bibleVerse.setVerseText(bibleHelper.getCurrentWeeklyVerseText(""));
+			bibleVerse.setVerse(bibleHelper.getCurrentWeeklyVerse(0));
+			bibleVerse.setChapter(bibleHelper.getCurrentWeeklyChapter(0));
+			Version version = new Version();
+			version.setLanguage(bibleHelper.getCurrentLanguage("English"));
+			version.setShortName(bibleHelper.getCurrentVersionName("KJV"));
+			version.setId(bibleHelper.getCurrentVersionId(4));
+			bibleVerse.setVersion(version);
+			ArrayList<Bible> verses = new ArrayList<Bible>();
+			verses.add(bibleVerse);
+			HighlightListAdapter adt = new HighlightListAdapter(this.getActivity(), verses, true, this.getResources().getString(R.string.verse_of_the_week));
+			lstView.setAdapter(adt);
 		}
 		else
 		{
@@ -79,15 +94,19 @@ public class HomeFragment extends Fragment {
 	}
 	private class WeeklyVerseTask extends AsyncTask<String, Integer, org.theBOC.bocbible.Models.Bible> {
 
-	    //private Context context;
+	    private Context context;
 	    public WeeklyVerseTask(Context context) {
-	        //this.context = context;
+	        this.context = context;
 	    }
 
 	    @Override
 	    protected org.theBOC.bocbible.Models.Bible doInBackground(String... params) 
 	    {
-	    	return bibleDB.getWeeklyVerse(bibleHelper.getCurrentVersionName("KJV"), weekNumber);
+	    	Version version = new Version();
+	    	version.setLanguage(bibleHelper.getCurrentLanguage("English"));
+			version.setShortName(bibleHelper.getCurrentVersionName("KJV"));
+			version.setId(bibleHelper.getCurrentVersionId(4));
+	    	return bibleDB.getWeeklyVerse(version, weekNumber);
 	    }
 	    
 	    @Override
@@ -104,14 +123,16 @@ public class HomeFragment extends Fragment {
 	    @Override
 	    protected void onPostExecute(org.theBOC.bocbible.Models.Bible result) 
 	    {
-	    	txtWeeklyVerse.setText(result.getVerseText());
-			txtWeeklyVerseReference.setText(result.getBook() + " " + result.getChapter() + ":" + result.getVerse());
-			bibleHelper.setCurrentWeeklyBookId(result.getBookId());
+	    	bibleHelper.setCurrentWeeklyBookId(result.getBookId());
 			bibleHelper.setCurrentWeeklyBookName(result.getBook());
 			bibleHelper.setCurrentWeeklyChapter(result.getChapter());
 			bibleHelper.setCurrentWeeklyVerse(result.getVerse());
 			bibleHelper.setCurrentWeeklyVerseText(result.getVerseText());
 			bibleHelper.setCurrentWeeklyVerseWeek(weekNumber);
+			ArrayList<Bible> verses = new ArrayList<Bible>();
+			verses.add(result);
+			HighlightListAdapter adt = new HighlightListAdapter(this.context, verses, true, this.context.getResources().getString(R.string.verse_of_the_week));
+			lstView.setAdapter(adt);
     	}
 	}
 }
