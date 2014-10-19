@@ -82,9 +82,9 @@ public class Bible extends DbBase {
 		}
 		return verses;
 	}
-	public org.theBOC.bocbible.Models.Bible getWeeklyVerse(String version, int weekNumber) 
+	public org.theBOC.bocbible.Models.Bible getWeeklyVerse(org.theBOC.bocbible.Models.Version version, int weekNumber) 
 	{
-		String  sqlSelect = "SELECT A.ZBOOKID, A.ZBOOK, A.ZCHAPTER, A.ZVERSE, A.ZVERSETEXT FROM ZBIBLE" + version + " A " +
+		String  sqlSelect = "SELECT A.ZBOOKID, A.ZBOOK, A.ZCHAPTER, A.ZVERSE, A.ZVERSETEXT FROM ZBIBLE" + version.getShortName() + " A " +
 				"INNER JOIN ZWEEKLYVERSE B ON A.ZBOOKID=B.ZBOOKID AND A.ZCHAPTER=B.ZCHAPTER AND A.ZVERSE = B.ZVERSE " +
 				"WHERE B.ZID = " + weekNumber;
 		
@@ -99,6 +99,7 @@ public class Bible extends DbBase {
 	            	bible.setChapter(c.getInt(2));
 	                bible.setVerse(c.getInt(3));
 	                bible.setVerseText(c.getString(4));
+	                bible.setVersion(version);
 	        }
 		}
 		catch(Exception e)
@@ -224,15 +225,31 @@ public class Bible extends DbBase {
 		}
 		String [] sqlSelect = {"docid", "ZVERSE", "ZVERSETEXT, ZBOOK, ZCHAPTER, ZBOOKID"};
 		//String sqlTables = "ZBIBLE" + version.getShortName() + "_FTS"; //****
-		String where = " ZVERSETEXT MATCH '*" + query + "*' ";
+		String[] parts = query.split("\\|", -1);
+		String where = "";
 		if(testament == 2)
 		{
-			where += " AND ZBOOKID > 39 ";  
+			where += "ZBOOKID > 39 AND ZVERSETEXT MATCH (";  
 		}
-		if(testament == 1)
+		else if(testament == 1)
 		{
-			where += " AND ZBOOKID <= 39 ";  
+			where += "ZBOOKID <= 39 AND ZVERSETEXT MATCH (";  
 		}
+		else
+		{
+			where += "ZVERSETEXT MATCH ('";  
+		}
+		for(int i = 0; i < parts.length; i++)
+		{
+			if(!parts[i].trim().equals(""))
+			{
+				if(i < parts.length - 1)
+					where += "\"*" + parts[i].trim() + "*\" OR ";
+				else
+					where += "\"*" + parts[i].trim() + "*\"";
+			}
+		}
+		where += "')";
 		ArrayList<org.theBOC.bocbible.Models.Bible> verses = new ArrayList<org.theBOC.bocbible.Models.Bible>();
 		qb.setTables(sqlTables);
 		try
