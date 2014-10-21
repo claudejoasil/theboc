@@ -45,6 +45,7 @@ public class Home extends Activity {
     private final String ABOUTTAG = "ABOUT_TAG";
     private final String BIBLETAG = "BIBLE_TAG";
     private final String SEARCHTAG = "SEARCH_TAG";
+    //private final String NOTETAG = "NOTE_TAG";
     private BOCDialogFrag4Activity dialFrag;
     private Context context;
     private Fragment frag;
@@ -69,6 +70,7 @@ public class Home extends Activity {
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[3], navMenuIcons.getResourceId(3, -1)));
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[4], navMenuIcons.getResourceId(4, -1)));
 		navDrawerItems.add(new NavDrawerItem(navMenuTitles[5], navMenuIcons.getResourceId(5, -1)));
+		//navDrawerItems.add(new NavDrawerItem(navMenuTitles[6], navMenuIcons.getResourceId(6, -1)));
 		// Recycle the typed array
 		navMenuIcons.recycle();		
 		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
@@ -192,6 +194,10 @@ public class Home extends Activity {
 	    		frag = new HightlightsFragment();
 	    		tag = HIGHLIGHTSTAG;
 	    		break;
+	    	//case 4:
+	    		//frag = new NoteFragment();
+	    		//tag = NOTETAG;
+	    		//break;
 	    	case 4:
 	    		frag = new About();
 	    		tag = ABOUTTAG;

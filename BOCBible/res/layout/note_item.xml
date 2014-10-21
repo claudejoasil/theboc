@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+	android:paddingLeft="@dimen/activity_horizontal_margin"	
+	android:paddingRight="@dimen/activity_horizontal_margin">
+ 
+    <TextView android:id="@+id/note_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textIsSelectable="true"/>
+    <Button android:id="@+id/btn_edit"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:background="@drawable/btn_brown_bg"
+	        android:textColor="@color/btn_brown_text_color"
+	        android:text="@string/search"/>
+    <Button android:id="@+id/btn_delete"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:background="@drawable/btn_brown_bg"
+	        android:textColor="@color/btn_brown_text_color"
+	        android:text="@string/search"/>
+</RelativeLayout>

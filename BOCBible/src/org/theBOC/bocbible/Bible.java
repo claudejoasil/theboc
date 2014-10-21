@@ -33,7 +33,8 @@ public class Bible  extends Fragment {
 	public static final int lastBookId = 66;
 	public static final int lastOldTestamentBookId = 39;
 	public org.theBOC.bocbible.Models.Book currentBookObj;
-	public static org.theBOC.bocbible.Models.Version currentVersionObj;
+	public static org.theBOC.bocbible.Models.Version currentVersionObj = null;
+	public static org.theBOC.bocbible.Models.Version currentVersion2Obj;
 	private BibleHelper bibleHelper;
 	private MiscHelper miscHelper;
 	private Menu menu;
@@ -50,7 +51,7 @@ public class Bible  extends Fragment {
 	private static org.theBOC.bocbible.database.Book bookDB;
 	private static org.theBOC.bocbible.database.Version versionDB;
 	private static ArrayList<org.theBOC.bocbible.Models.Bible> m_verses;
-	private static String[] dualVersions;
+	private static ArrayList<org.theBOC.bocbible.Models.Version> dualVersions;
 	private static int m_textSize;
 	private static int mChapter;
 	private static int mBookId;
@@ -110,6 +111,8 @@ public class Bible  extends Fragment {
     @Override
 	public void onResume() {
     	super.onResume();
+    	if(dualVersions != null && dualVersions.size() > 1 && bibleHelper.getCurrentVersionId2() <= 0)
+    		dualVersions.remove(1);
     	if(miscHelper.reloadBiblePage)
     	{
 	    	this.setCurrentValues(-1);
@@ -227,7 +230,10 @@ public class Bible  extends Fragment {
 		if(versionDB == null)
 			versionDB = new org.theBOC.bocbible.database.Version(this.getActivity());
 		currentVersionObj = versionDB.getVersion(bibleHelper.getCurrentVersionId(4), null);
-		
+		if(bibleHelper.getCurrentVersionId2() > 0)
+			currentVersion2Obj = versionDB.getVersion(bibleHelper.getCurrentVersionId2(), null);
+		else
+			currentVersion2Obj = null;
 		if(bookDB == null)
 			bookDB = new org.theBOC.bocbible.database.Book(this.getActivity());
 		if(bookId == -1)
@@ -291,6 +297,17 @@ public class Bible  extends Fragment {
     		if(mBookId == bibleHelper.getCurrentBookId(0) && mChapter == bibleHelper.getCurrentChapter(0) && mVersionId == bibleHelper.getCurrentVersionId(0) && mVersionId2 == bibleHelper.getCurrentVersionId2())
     		{
     			m_textSize += textSizeIncrement;
+    			if(BibleHelper.unHighlighted != null)
+    			{
+    				for(int i = 0; i < m_verses.size(); i++)
+    				{
+    					if(BibleHelper.unHighlighted.contains(m_verses.get(i).getPk()))
+    					{
+    						m_verses.get(i).setHighLights(null);
+    					}
+    				}
+    				BibleHelper.unHighlighted = null;
+    			}	
     			VerseListAdapter adt = new VerseListAdapter(this.getActivity(), m_verses, (float) m_textSize, dualVersions);
     			lstView.setAdapter(adt);
     			lstView.setSelection(bibleHelper.getCurrentVerse(1) - 1);
@@ -365,15 +382,15 @@ public class Bible  extends Fragment {
 
 	    @Override
 	    protected ArrayList<org.theBOC.bocbible.Models.Bible> doInBackground(Integer... textSize) {
-	        dualVersions = new String[2];
-	        dualVersions[0] = currentVersionObj.getShortName();
+	        dualVersions = new ArrayList<org.theBOC.bocbible.Models.Version>();
+	        dualVersions.add(currentVersionObj);
 	        mVersionId = currentVersionObj.getId();
 	        mVersionId2 = bibleHelper.getCurrentVersionId2();
 	        mBookId = bibleHelper.getCurrentBookId(1);
 	        mChapter = bibleHelper.getCurrentChapter(1);
-	        if(bibleHelper.getCurrentVersionId2() > 0)
+	        if(currentVersion2Obj != null)
 			{
-				dualVersions[1] = bibleHelper.getCurrentVersionName2();
+				dualVersions.add(currentVersion2Obj);
 			}
 	    	if(textSize[0] == 0)
 	    	{
@@ -383,7 +400,7 @@ public class Bible  extends Fragment {
 	    		}
 				else
 				{
-					m_verses = bibleDB.getVerses(bibleHelper.getCurrentBookId(1), bibleHelper.getCurrentChapter(1), dualVersions[0]);
+					m_verses = bibleDB.getVerses(bibleHelper.getCurrentBookId(1), bibleHelper.getCurrentChapter(1), currentVersionObj);
 				}
 	    	}
 	    	m_textSize += textSize[0];
