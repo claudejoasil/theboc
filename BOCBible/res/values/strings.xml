@@ -10,6 +10,7 @@
         <item>Search the Bible</item>
         <!-- <item>BOC Reading Plan</item> -->
         <item>My Highlights</item>
+        <!-- <item>My Notes</item> -->
         <item>About</item>
         <item>Exit</item>
     </string-array>
@@ -23,6 +24,7 @@
         <item>@drawable/ic_search</item>
         <!-- <item>@drawable/ic_reading_plan</item> -->
         <item>@drawable/ic_highlight</item>
+        <!-- <item>@drawable/ic_article</item> -->
         <item>@drawable/ic_about</item>
         <item>@drawable/ic_exit</item>
     </array>
@@ -66,6 +68,7 @@
 With a very simple navigation, BOC Bible provides a very simple and intuitive user experience.\n\nWe have ensured that anyone with a basic Android experience can use the application without any problems.</string>
     <string name="title_activity_hightlights_fragment">Hightlights</string>
 	<string name="no_highLights_found">You currently have no highlights for this version</string>
+	<string name="no_notes_found">No notes found</string>
 	<string name="no_result_found">No Result Found</string>
 	<string name="searching_version">Searching version</string>
 	<string name="tap_to_search">Tap to Search</string>

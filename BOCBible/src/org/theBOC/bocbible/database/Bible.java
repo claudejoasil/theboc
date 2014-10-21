@@ -10,12 +10,12 @@ public class Bible extends DbBase {
 	{
 		super(context);
 	}
-	public ArrayList<org.theBOC.bocbible.Models.Bible> getVerses(int bookId, int chapter, String version) 
+	public ArrayList<org.theBOC.bocbible.Models.Bible> getVerses(int bookId, int chapter, org.theBOC.bocbible.Models.Version version) 
 	{
 		SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-		String [] sqlSelect = {"Z_PK", "ZVERSE", "ZVERSETEXT, ZHIGHLIGHT"};
-		String sqlTables = "ZBIBLE" + version;
-		String where = "ZBOOKID=" + bookId + " AND ZCHAPTER=" + chapter;
+		String [] sqlSelect = {"B.Z_PK", "B.ZVERSE", "B.ZVERSETEXT, H.ZHIGHLIGHT_RANGE, B.ZBOOKID, B.ZBOOK, B.ZCHAPTER "};
+		String sqlTables = "ZBIBLE" + version.getShortName() + " B LEFT JOIN ZHIGHLIGHT H ON B.Z_PK = H.ZVERSEID AND H.ZVERSIONID = " + version.getId();
+		String where = "B.ZBOOKID=" + bookId + " AND B.ZCHAPTER=" + chapter;
 		ArrayList<org.theBOC.bocbible.Models.Bible> verses = new ArrayList<org.theBOC.bocbible.Models.Bible>();
 		qb.setTables(sqlTables);
 		try
@@ -30,6 +30,10 @@ public class Bible extends DbBase {
 	                bible.setVerse(Integer.parseInt(c.getString(1)));
 	                bible.setVerseText(c.getString(2));
 	                bible.setHighLights(c.getString(3));
+	                bible.setBookId(c.getInt(4));
+	                bible.setBook(c.getString(5));
+	                bible.setChapter(c.getInt(6));
+	                bible.setVersion(version);
 	                verses.add(bible);
 	            } while (c.moveToNext());
 	        }
@@ -41,21 +45,26 @@ public class Bible extends DbBase {
 		return verses;
 	}
 	
-	public ArrayList<org.theBOC.bocbible.Models.Bible> getDualVersionVerses(int bookId, int chapter, String[] version) 
+	public ArrayList<org.theBOC.bocbible.Models.Bible> getDualVersionVerses(int bookId, int chapter, ArrayList<org.theBOC.bocbible.Models.Version> version) 
 	{
 
-		int numChapter1 = this.GetNumVerses(bookId, chapter, version[0]);
-		int numChapter2 = this.GetNumVerses(bookId, chapter, version[1]);
-		String query = "SELECT B1.Z_PK, B1.ZVERSE, B1.ZVERSETEXT, B2.ZVERSETEXT, B1.ZHIGHLIGHT, B2.ZHIGHLIGHT " +
-				" FROM ZBIBLE" + version[0] + " B1 " +
-				" LEFT JOIN ZBIBLE" + version[1] + " B2 ON B1.ZBOOKID=B2.ZBOOKID AND B1.ZCHAPTER=B2.ZCHAPTER AND B1.ZVERSE = B2.ZVERSE " +
-				" WHERE B1.ZBOOKID=" + bookId + " AND B1.ZCHAPTER=" + chapter;
+		int numChapter1 = this.GetNumVerses(bookId, chapter, version.get(0).getShortName());
+		int numChapter2 = this.GetNumVerses(bookId, chapter, version.get(1).getShortName());
+		String query =  "SELECT B1.Z_PK, B1.ZVERSE, B1.ZVERSETEXT, B2.ZVERSETEXT, B1.ZHIGHLIGHT_RANGE, B2.ZHIGHLIGHT_RANGE " +
+						" FROM (" +
+						"SELECT Z_PK, ZVERSE, ZVERSETEXT, ZBOOKID, ZCHAPTER, ZHIGHLIGHT_RANGE FROM ZBIBLE" + version.get(0).getShortName() + " B LEFT JOIN ZHIGHLIGHT H ON B.Z_PK = H.ZVERSEID AND H.ZVERSIONID = " + version.get(0).getId() + " WHERE B.ZBOOKID=" + bookId + " AND B.ZCHAPTER=" + chapter + 
+						") B1 LEFT JOIN (" +
+						"SELECT Z_PK, ZVERSE, ZVERSETEXT, ZBOOKID, ZCHAPTER, ZHIGHLIGHT_RANGE FROM ZBIBLE" + version.get(1).getShortName() + " B LEFT JOIN ZHIGHLIGHT H ON B.Z_PK = H.ZVERSEID AND H.ZVERSIONID = " + version.get(1).getId() + " WHERE B.ZBOOKID=" + bookId + " AND B.ZCHAPTER=" + chapter +
+						") B2 ON B1.ZBOOKID=B2.ZBOOKID AND B1.ZCHAPTER=B2.ZCHAPTER AND B1.ZVERSE = B2.ZVERSE ";
+		
 		if(numChapter1 < numChapter2)
 		{
-			query = "SELECT B2.Z_PK, B2.ZVERSE, B1.ZVERSETEXT, B2.ZVERSETEXT, B1.ZHIGHLIGHT, B2.ZHIGHLIGHT " +
-					" FROM ZBIBLE" + version[1] + " B2 " +
-					" LEFT JOIN ZBIBLE" + version[0] + " B1 ON B2.ZBOOKID=B1.ZBOOKID AND B2.ZCHAPTER=B1.ZCHAPTER AND B2.ZVERSE = B1.ZVERSE " +
-					" WHERE B2.ZBOOKID=" + bookId + " AND B2.ZCHAPTER=" + chapter;
+			query = "SELECT B2.Z_PK, B2.ZVERSE, B1.ZVERSETEXT, B2.ZVERSETEXT, B1.ZHIGHLIGHT_RANGE, B2.ZHIGHLIGHT_RANGE " +
+					" FROM (" +
+					"SELECT Z_PK, ZVERSE, ZVERSETEXT, ZBOOKID, ZCHAPTER, ZHIGHLIGHT_RANGE FROM ZBIBLE" + version.get(1).getShortName() + " B LEFT JOIN ZHIGHLIGHT H ON B.Z_PK = H.ZVERSEID AND H.ZVERSIONID = " + version.get(1).getId() + " WHERE B.ZBOOKID=" + bookId + " AND B.ZCHAPTER=" + chapter + 
+					") B2 LEFT JOIN (" +
+					"SELECT Z_PK, ZVERSE, ZVERSETEXT, ZBOOKID, ZCHAPTER, ZHIGHLIGHT_RANGE FROM ZBIBLE" + version.get(0).getShortName() + " B LEFT JOIN ZHIGHLIGHT H ON B.Z_PK = H.ZVERSEID AND H.ZVERSIONID = " + version.get(0).getId() + " WHERE B.ZBOOKID=" + bookId + " AND B.ZCHAPTER=" + chapter +
+					") B1 ON B1.ZBOOKID=B2.ZBOOKID AND B1.ZCHAPTER=B2.ZCHAPTER AND B1.ZVERSE = B2.ZVERSE ";
 		}
 		ArrayList<org.theBOC.bocbible.Models.Bible> verses = new ArrayList<org.theBOC.bocbible.Models.Bible>();
 		try
@@ -129,10 +138,14 @@ public class Bible extends DbBase {
 		return 0;
 	}
 	
-	public void HightLightVerse(int id, String highLight, String version)
+	public void HightLightVerse(int id, String highLight, org.theBOC.bocbible.Models.Version version)
 	{
-		String query = "UPDATE ZBIBLE" + version + " SET ZHIGHLIGHT=COALESCE(ZHIGHLIGHT, '') || '" + highLight + "'" +
-				" WHERE Z_PK=" + id;
+		String query = "INSERT OR REPLACE INTO ZHIGHLIGHT (ZID, ZVERSIONID, ZVERSEID, ZHIGHLIGHT_RANGE) " +
+				       "values (" +
+				       "(SELECT ZID FROM ZHIGHLIGHT WHERE ZVERSEID = " + id + " AND ZVERSIONID = " + version.getId() + "), " +
+				       version.getId() + ", " +
+				       id + ", " + 
+				       "COALESCE((SELECT ZHIGHLIGHT_RANGE FROM ZHIGHLIGHT WHERE ZVERSEID = " + id + " AND ZVERSIONID = " + version.getId() + "), '') || '" + highLight + "')";
 		try
 		{
 			DB.execSQL(query);
@@ -143,10 +156,9 @@ public class Bible extends DbBase {
 		}
 	}
 	
-	public void UnHightLightVerse(int id, String version)
+	public void UnHightLightVerse(int id, org.theBOC.bocbible.Models.Version version)
 	{
-		String query = "UPDATE ZBIBLE" + version + " SET ZHIGHLIGHT=''" +
-				" WHERE Z_PK=" + id;
+		String query = "DELETE FROM ZHIGHLIGHT WHERE ZVERSEID=" + id + " AND ZVERSIONID = " + version.getId();
 		try
 		{
 			DB.execSQL(query);
@@ -160,9 +172,9 @@ public class Bible extends DbBase {
 	public ArrayList<org.theBOC.bocbible.Models.Bible> getHighlightVerses(org.theBOC.bocbible.Models.Version version)
 	{
 		SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-		String [] sqlSelect = {"Z_PK", "ZVERSE", "ZVERSETEXT, ZHIGHLIGHT, ZBOOK, ZCHAPTER, ZBOOKID"};
-		String sqlTables = "ZBIBLE" + version.getShortName();
-		String where = "ZHIGHLIGHT IS NOT NULL and ZHIGHLIGHT != ''";
+		String [] sqlSelect = {"B.Z_PK", "B.ZVERSE", "B.ZVERSETEXT, H.ZHIGHLIGHT_RANGE, B.ZBOOK, B.ZCHAPTER, B.ZBOOKID"};
+		String sqlTables = "ZBIBLE" + version.getShortName() + " B INNER JOIN ZHIGHLIGHT H ON B.Z_PK = H.ZVERSEID AND H.ZVERSIONID = " + version.getId();
+		String where = "H.ZHIGHLIGHT_RANGE IS NOT NULL and H.ZHIGHLIGHT_RANGE != ''";
 		ArrayList<org.theBOC.bocbible.Models.Bible> verses = new ArrayList<org.theBOC.bocbible.Models.Bible>();
 		qb.setTables(sqlTables);
 		try

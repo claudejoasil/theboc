@@ -27,16 +27,16 @@ public class VerseListAdapter extends BaseAdapter {
 	
 	private Context context;
 	private ArrayList<Bible> verses;
-	private static String[] versions;
+	private static ArrayList<org.theBOC.bocbible.Models.Version> versions;
 	private float textSize;
 	private boolean singleVersion;
 	private static final int HIGHTLIGHT = R.id.highLight_menu_item;
-	public VerseListAdapter(Context context, ArrayList<Bible> verses, float textSize, String[] theVersions){
+	public VerseListAdapter(Context context, ArrayList<Bible> verses, float textSize, ArrayList<org.theBOC.bocbible.Models.Version> theVersions){
 		this.context = context;
 		this.verses = verses;
 		this.textSize = textSize;
 		versions = theVersions;
-		singleVersion = versions[1] == null;
+		singleVersion = versions.size() == 1;
 	}
 	
 	@Override
@@ -186,7 +186,7 @@ public class VerseListAdapter extends BaseAdapter {
 	                    	}
 	                    	verses.get(position).setHighLights(newHighLights);
 	                    	org.theBOC.bocbible.database.Bible bibleDB = new org.theBOC.bocbible.database.Bible(context);
-	                    	bibleDB.HightLightVerse(id, hightLights, versions[versionOffset]);
+	                    	bibleDB.HightLightVerse(id, hightLights, versions.get(versionOffset));
 	                    }
 	                    catch(Exception e)
 	                    {

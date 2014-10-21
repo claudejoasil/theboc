@@ -97,9 +97,13 @@ public class HighlightListAdapter extends BaseAdapter{
     					@Override
     					public void onDialogPositiveClick(DialogFragment dialog) {
     						org.theBOC.bocbible.database.Bible bibleDB = new org.theBOC.bocbible.database.Bible(context);
-    					  	bibleDB.UnHightLightVerse(verses.get(position).getPk(), verses.get(position).getVersion().getShortName());
+    						int id = verses.get(position).getPk();
+    					  	bibleDB.UnHightLightVerse(verses.get(position).getPk(), verses.get(position).getVersion());
     					  	verses.remove(position);
     					  	notifyDataSetChanged();
+    					  	if(BibleHelper.unHighlighted == null)
+    					  		BibleHelper.unHighlighted = new ArrayList<Integer>();
+    					  	BibleHelper.unHighlighted.add(id);
     					}
     					
     					@Override

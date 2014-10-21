@@ -1,5 +1,7 @@
 package org.theBOC.bocbible.common;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -41,7 +43,8 @@ public class BibleHelper {
 	private String currentWeeklyBookName;
 	private String currentWeeklyVerseText;
 	private String currentWeeklyVerseVersion;
-	
+	public static ArrayList<Integer> unHighlighted = null;
+ 	
 	private static BibleHelper instance;
 	private SharedPreferences sharedpreferences;
 	public static final String currentValues = "BibleCurrentValues";
