@@ -88,6 +88,13 @@ public class Versions extends FragmentActivity {
 		{
 	          public void onItemClick(AdapterView<?> parent, final View view, int position, long id) 
 	          {
+	        	  CheckBox chk = (CheckBox) view.findViewById(R.id.version_select);
+	        	  if(chk != null && chk.isShown())
+	        	  {
+	        		  if(chk.isEnabled()) 
+	        			  chk.toggle();
+	        		  return;
+	        	  }
 	        	  m_clickedVersion = versions.get(position);
 	        	  if(!m_clickedVersion.getIsGroupHeader())
 	        	  {
